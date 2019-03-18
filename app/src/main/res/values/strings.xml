@@ -1,0 +1,21 @@
+<resources>
+    <string name="app_name">Beam</string>
+    <string name="beam">Beam</string>
+    <string name="skip">SKIP</string>
+    <string name="next">NEXT</string>
+    <string name="start">Let\'s Go!</string>
+    <string name="slide_1_title">Welcome</string>
+    <string name="slide_2_title">Box Office Updates</string>
+    <string name="slide_1_desc"><![CDATA[The easiest way to get access to Movies, Tv Series & Theaters!]]></string>
+    <string name="slide_2_desc">Get the best upcoming and in-cinema movies updates!</string>
+    <string name="slide_3_title">Save Favourites</string>
+    <string name="slide_3_desc">Add your favourite movies and series by clicking the favourite icon!</string>
+    <string name="slide_4_title">Television Series</string>
+    <string name="slide_4_desc">Access to over 50 thousand series you love!</string>
+    <string name="slide_5_title">Movie Tickets</string>
+    <string name="slide_5_desc">Purchase movie tickets for your family and friends!</string>
+    <string name="plot_synopsis">Plot Synopsis</string>
+    <string name="cast">Cast</string>
+    <string name="reviews">Reviews</string>
+    <string name="trailer">Trailer</string>
+</resources>
