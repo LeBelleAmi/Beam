@@ -26,6 +26,13 @@
     <color name="dot_light_screen4">#6b74e9</color>
     <color name="dot_light_screen5">#6b74e9</color>
     <color name="color_text">#ffffff</color>
+    <color name="colorBackground">#8000</color>
+    <color name="colorBackgroundTwo">#171917</color>
+    <color name="purple_dark">#6e2f8d</color>
+    <color name="purple_light">#8e58a5</color>
+    <color name="purple_final">#ab85bb</color>
+    <color name="purple_finaloone">#c8aed5</color>
+
 
     <array name="array_dot_active">
         <item>@color/dot_light_screen1</item>

@@ -20,7 +20,7 @@ import java.util.List;
 import lebelleami.com.beam.Model.TvData;
 import lebelleami.com.beam.Utils.Url;
 import lebelleami.com.beam.R;
-import lebelleami.com.beam.TvDetails;
+import lebelleami.com.beam.Controller.TvDetails;
 
 public class TvAdapter extends RecyclerView.Adapter<TvAdapter.TvViewHolder>{
 

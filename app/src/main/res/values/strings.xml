@@ -18,4 +18,43 @@
     <string name="cast">Cast</string>
     <string name="reviews">Reviews</string>
     <string name="trailer">Trailer</string>
+    <string name="video">Video Player</string>
+    <string name="ticket">Movie Ticket</string>
+    <string name="favourite">Favourite</string>
+    <string name="settings">Settings</string>
+    <string name="watchlist">Watch List</string>
+    <string name="title_activity_settings">Settings</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="general">General Settings</string>
+    <string name="about_app">About</string>
+    <string name="about">This is a movies update app designed for research purposes by Omawumi Eyekpimi [LeBelleAmi]. All rights reserved.</string>
+    <string name="tittle_version">Version</string>
+    <string name="version">App Version 1.0</string>
+    <string name="powered">API Powered By</string>
+    <string name="tmdb">The Movie Database</string>
+    <string name="tmdb_link">https://themoviedb.org/</string>
+    <string name="legal">Legal</string>
+    <string name="legal_notice">Libraries</string>
+    <string name="privacy">Privacy Policy</string>
+    <string name="terms">Terms Of Use</string>
+    <string name="help_center">Help Center</string>
+    <string name="help">Help</string>
+    <string name="feedback">FeedBack</string>
+    <string name="account">Account</string>
+    <string name="account_seetings">Account Settings</string>
+    <string name="player_quality">Video Quality</string>
+    <string name="player">Player</string>
+    <string name="movie_notification">Notification</string>
+    <string name="notify">notify</string>
+    <string name="notify_summary"><![CDATA[Notify me about new movies & series]]></string>
+    <string name="one">Standard Resolution</string>
+    <string name="two">480p</string>
+    <string name="three">720p HD</string>
+    <string name="four">1080p HD</string>
+    <string name="resolution">update_resolution</string>
+    <string name="email_link">mailto:omawumi@lebelleami.com</string>
+    <string name="title_privacy">Privacy Policy</string>
+    <string name="title_terms">Terms Of Use</string>
 </resources>

@@ -1,4 +1,4 @@
-package lebelleami.com.beam;
+package lebelleami.com.beam.Controller;
 
 import android.content.Intent;
 import android.graphics.Typeface;
@@ -9,6 +9,8 @@ import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
 import android.widget.TextView;
+
+import lebelleami.com.beam.R;
 
 public class SplashScreen extends AppCompatActivity {
 

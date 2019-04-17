@@ -1,4 +1,4 @@
-package lebelleami.com.beam;
+package lebelleami.com.beam.Utils;
 
 import android.content.Context;
 import android.content.SharedPreferences;

@@ -3,9 +3,23 @@
     <!-- Base application theme. -->
     <style name="Base.AppTheme" parent="Theme.AppCompat.NoActionBar">
         <!-- Customize your theme here. -->
+        <item name="colorPrimary">@color/colorPrimaryDark</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="colorAccent">@color/colorAccent</item>
+    </style>
+
+    <!-- styles.xml -->
+    <style name="ToolbarTheme" parent="ThemeOverlay.AppCompat.Dark.ActionBar">
+        <item name="android:fontFamily">@font/montserrat_semibold</item>
+    </style>
+
+    <style name="Base.AppSettings" parent="Theme.AppCompat">
+        <!-- Customize your theme here. -->
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
+        <item name="android:background">@color/colorBackgroundTwo</item>
+        <item name="preferenceTheme">@style/PreferenceThemeOverlay.v14.Material</item>
     </style>
 
 
@@ -15,5 +29,11 @@
         <item name="android:paddingTop">24dp</item>
         <item name="android:paddingBottom">24dp</item>
         <item name="android:orientation">vertical</item>
+        <item name="android:background">@color/colorBackgroundTwo</item>
+    </style>
+
+    <style name="Widget.CardContentTwo" parent="android:Widget">
+        <item name="android:orientation">vertical</item>
+        <item name="android:background">@color/colorBackgroundTwo</item>
     </style>
 </resources>

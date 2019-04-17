@@ -1,8 +1,13 @@
-package lebelleami.com.beam;
+package lebelleami.com.beam.Controller;
 
-import android.content.res.Configuration;
+import android.arch.lifecycle.LiveData;
+import android.arch.lifecycle.Observer;
+import android.graphics.Color;
+import android.support.annotation.Nullable;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CollapsingToolbarLayout;
+import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.CardView;
@@ -13,6 +18,7 @@ import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -28,6 +34,13 @@ import java.util.Locale;
 
 import lebelleami.com.beam.Api.Client;
 import lebelleami.com.beam.Api.Service;
+import lebelleami.com.beam.Database.AppDatabase;
+import lebelleami.com.beam.Database.MovieEntity;
+import lebelleami.com.beam.DatabaseViewModel.AddFavouriteMovieViewModel;
+import lebelleami.com.beam.DatabaseViewModel.AppExecutor;
+import lebelleami.com.beam.DatabaseViewModel.FavouriteMoviesViewModel;
+import lebelleami.com.beam.Model.MovieData;
+import lebelleami.com.beam.R;
 import lebelleami.com.beam.Utils.Url;
 import lebelleami.com.beam.Model.Cast;
 import lebelleami.com.beam.View.CastAdapter;
@@ -42,64 +55,78 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class TvDetails extends AppCompatActivity {
+public class MovieDetails extends AppCompatActivity {
 
     ImageView backdropImg, posterImg;
     KenBurnsView kbv;
-    TextView tvtitle, year, rating, reviews, language, tvrating, genre, synopsis;
+    TextView movietitle, year, rating, reviews, language, movierating, genre, synopsis;
     CardView posterCard;
     RecyclerView trailerrecyclerView, reviewrecyclerView, castrecyclerView;
     private ReviewAdapter reviewAdapter;
     private TrailerAdapter trailerAdapter;
     private CastAdapter castAdapter;
-    private List<TrailerData> trailerList;
+    private List<TrailerData>trailerList;
     private List<ReviewData>reviewList;
     private List<CastData>castList;
+    MovieData movieData;
     Trailer trailer;
     Review review;
     Cast cast;
     LinearLayoutManager layoutManager, layoutManagerOne,layoutManagerTwo;
+    FloatingActionButton favFab;
+    boolean movieIsFavourited = false;
 
     //poster animation
     private static final int PERCENTAGE_TO_ANIMATE_POSTER = 20;
     private boolean mIsPosterShown = true;
 
+    private AppDatabase mAppdatabase;
+
+    String movieTitle, movieVoteAverage, movieReleaseDate, movieAdult, moviePopularity, movieLanguage,
+            movieId, movieVoteCount, movieBackdrop, movieOverview, movieGenre, moviePoster;
+    int movie_id, id;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_tv_details);
+        setContentView(R.layout.activity_movie_details);
+
+        mAppdatabase = AppDatabase.getsINSTANCE(getApplicationContext());
 
         //backdropImg = findViewById(R.id.backdrop);
         posterImg = findViewById(R.id.movie_thumbnail_image2);
-        tvtitle = findViewById(R.id.movie_title1);
+        movietitle = findViewById(R.id.movie_title1);
         year = findViewById(R.id.movie_year1);
         rating = findViewById(R.id.movie_rating1);
         reviews = findViewById(R.id.movie_reviews);
         language = findViewById(R.id.original_lang);
         genre = findViewById(R.id.genre);
-        tvrating = findViewById(R.id.rated);
+        movierating = findViewById(R.id.rated);
         synopsis = findViewById(R.id.overview);
         posterCard = findViewById(R.id.movie_card1);
-        kbv = findViewById(R.id.backdropTwo);
+        kbv = findViewById(R.id.backdropOne);
+        favFab = findViewById(R.id.fav_button);
 
 
         //get items from the adapter intent and set in views
         Bundle data = getIntent().getBundleExtra("items");
-        final String tvTitle = data.getString("movieTitle");
-        String movieVoteAverage = data.getString("movieVoteAverage");
-        String movieReleaseDate = data.getString("movieReleaseDate");
-        String moviePopularity = data.getString("moviePopularity");
-        String movieLanguage = data.getString("movieLanguage");
-        String tvId = data.getString("tvId");
-        String movieVoteCount = data.getString("movieVoteCount");
-        String movieBackdrop = data.getString("movieBackdrop");
-        String movieOverview = data.getString("movieOverview");
-        String movieGenre = data.getString("movieGenre");
-        String moviePoster = data.getString("moviePoster");
+        movieTitle = data.getString("movieTitle");
+        movieVoteAverage = data.getString("movieVoteAverage");
+        movieReleaseDate = data.getString("movieReleaseDate");
+        movieAdult = data.getString("movieAdult");
+        moviePopularity = data.getString("moviePopularity");
+        movieLanguage = data.getString("movieLanguage");
+        movieId = data.getString("movieId");
+        movieVoteCount = data.getString("movieVoteCount");
+        movieBackdrop = data.getString("movieBackdrop");
+        movieOverview = data.getString("movieOverview");
+        movieGenre = data.getString("movieGenre");
+        moviePoster = data.getString("moviePoster");
+
+        final int movie_id = Integer.parseInt(movieId);
 
         //set movie details info
-        tvtitle.setText(tvTitle);
+        movietitle.setText(movieTitle);
         year.setText(getFormattedReleaseDate(movieReleaseDate));
         rating.setText(movieVoteAverage + "/10");
         reviews.setText(movieVoteCount);
@@ -109,7 +136,6 @@ public class TvDetails extends AppCompatActivity {
         Glide.with(this).load(Url.posterUrl(moviePoster)).into(posterImg);
         //Glide.with(this).load(Url.posterUrlBackdrop(movieBackdrop)).into(backdropImg);
         Glide.with(this).load(Url.posterUrlBackdrop(movieBackdrop)).into(kbv);
-
 
         // Find the toolbar view inside the activity layout
         Toolbar toolbar = findViewById(R.id.toolbar1);
@@ -141,7 +167,7 @@ public class TvDetails extends AppCompatActivity {
 
                 }
                 if (scrollRange + verticalOffset == 0) {
-                    collapsingToolbar.setTitle(tvTitle);
+                    collapsingToolbar.setTitle(movieTitle);
                     isShow = true;
                 } else if (isShow) {
                     collapsingToolbar.setTitle(" ");
@@ -168,13 +194,66 @@ public class TvDetails extends AppCompatActivity {
 
         });
 
+        checkIfMovieExistsInFavorite(movie_id);
+
+
+        favFab.setOnClickListener(new View.OnClickListener() {
+                                      @Override
+                                      public void onClick(View view) {
+
+
+                                         if (movieIsFavourited == true){
+                                              favFab.setImageResource(R.drawable.ic_favorite);
+                                              saveFavorite();
+                                              // showing snack bar with favourite text
+                                              final Snackbar snackbar = Snackbar
+                                                      .make(findViewById(R.id.main_content), "Movie has been added to favourite list!", Snackbar.LENGTH_INDEFINITE);
+                                              snackbar.setAction("Dismiss", new View.OnClickListener() {
+                                                  @Override
+                                                  public void onClick(View view) {
+                                                      snackbar.dismiss();
+
+                                                          }
+                                              });
+                                             snackbar.setActionTextColor(Color.YELLOW);
+                                              View snackbarView = snackbar.getView();
+                                              snackbarView.setBackgroundColor(getResources().getColor(R.color.colorAccent));
+                                              snackbar.show();
+                                          }else{
+
+                                              favFab.setImageResource(R.drawable.ic_favorite_border);
+                                              int mMovieId = Integer.parseInt(movieId);
+                                              deleteFavorite(mMovieId);
+                                              // showing snack bar with favourite text
+                                              final Snackbar snackbar = Snackbar
+                                                      .make(findViewById(R.id.main_content), "Movie has been removed from favourite list!", Snackbar.LENGTH_INDEFINITE);
+                                              snackbar.setAction("Dismiss", new View.OnClickListener() {
+                                                  @Override
+                                                  public void onClick(View view) {
+                                                      snackbar.dismiss();
+                                                  }
+                                              });
+                                              snackbar.setActionTextColor(Color.YELLOW);
+                                              View snackbarView = snackbar.getView();
+                                              snackbarView.setBackgroundColor(getResources().getColor(R.color.colorAccent));
+                                              snackbar.show();
+
+                                          }
+                                      }
+                                  }
+
+        );
+
         initializeTrailer();
         initializeReview();
         initializeCast();
         loadTrailer();
         loadReview();
-        //loadCast();
+        loadCast();
+
     }
+
+
 
     private void initializeTrailer(){
         trailerList = new ArrayList<>();
@@ -183,23 +262,16 @@ public class TvDetails extends AppCompatActivity {
         trailerrecyclerView.setHasFixedSize(true);
         // use a linear layout manager
         layoutManager = new LinearLayoutManager(getApplicationContext());
-        layoutManager.setOrientation(LinearLayoutManager.VERTICAL);
+        layoutManager.setOrientation(LinearLayoutManager.HORIZONTAL);
         trailerrecyclerView.setLayoutManager(layoutManager);
         trailerrecyclerView.setAdapter(trailerAdapter);
-
-        if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
-            trailerrecyclerView.setLayoutManager(new GridLayoutManager(getApplicationContext(), 2));
-
-        } else {
-            trailerrecyclerView.setLayoutManager(new GridLayoutManager(getApplicationContext(), 4));
-        }
 
     }
 
 
     private void loadTrailer() {
-        String tvId = getIntent().getBundleExtra("items").getString("tvId");
-        int trailerId = Integer.parseInt(tvId);
+        String movieId = getIntent().getBundleExtra("items").getString("movieId");
+        int trailerId = Integer.parseInt(movieId);
 
         try{
 
@@ -208,7 +280,7 @@ public class TvDetails extends AppCompatActivity {
                     client.getClient().create(Service.class);
 
 
-            Call<Trailer> call = apiService.getTvTrailerData(trailerId, Url.API_KEY);
+            Call<Trailer> call = apiService.getMovieTrailerData(trailerId, Url.API_KEY);
 
             call.enqueue(new Callback<Trailer>() {
                 @Override
@@ -244,8 +316,8 @@ public class TvDetails extends AppCompatActivity {
     }
 
     private void loadReview() {
-        String tvId = getIntent().getBundleExtra("items").getString("tvId");
-        int reviewId = Integer.parseInt(tvId);
+        String movieId = getIntent().getBundleExtra("items").getString("movieId");
+        int reviewId = Integer.parseInt(movieId);
 
         try{
 
@@ -254,7 +326,7 @@ public class TvDetails extends AppCompatActivity {
                     client.getClient().create(Service.class);
 
 
-            Call<Review> call = apiService.getTvReviewsData(reviewId, Url.API_KEY);
+            Call<Review> call = apiService.getReviewsData(reviewId, Url.API_KEY);
 
             call.enqueue(new Callback<Review>() {
                 @Override
@@ -285,23 +357,16 @@ public class TvDetails extends AppCompatActivity {
         castrecyclerView.setHasFixedSize(true);
         // use a linear layout manager
         layoutManagerTwo = new LinearLayoutManager(getApplicationContext());
-        layoutManagerTwo.setOrientation(LinearLayoutManager.VERTICAL);
+        layoutManagerTwo.setOrientation(LinearLayoutManager.HORIZONTAL);
         castrecyclerView.setLayoutManager(layoutManagerTwo);
         castrecyclerView.setAdapter(castAdapter);
 
-        if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
-            castrecyclerView.setLayoutManager(new GridLayoutManager(getApplicationContext(), 2));
-
-        } else {
-            castrecyclerView.setLayoutManager(new GridLayoutManager(getApplicationContext(), 4));
-        }
-
     }
 
-/*
+
     private void loadCast() {
-        String tvId = getIntent().getBundleExtra("items").getString("tvId");
-        int castId = Integer.parseInt(tvId);
+        String movieId = getIntent().getBundleExtra("items").getString("movieId");
+        int castId = Integer.parseInt(movieId);
 
         try{
 
@@ -310,7 +375,7 @@ public class TvDetails extends AppCompatActivity {
                     client.getClient().create(Service.class);
 
 
-            Call<Cast> call = apiService.getTvCastsData(castId, Url.API_KEY);
+            Call<Cast> call = apiService.getCastsData(castId, Url.API_KEY);
 
             call.enqueue(new Callback<Cast>() {
                 @Override
@@ -331,7 +396,65 @@ public class TvDetails extends AppCompatActivity {
         }catch (Exception e){
         }
 
-    }*/
+    }
+
+    // check if movie exist in favourite collections
+    private void checkIfMovieExistsInFavorite(final int movieId) {
+
+        AppExecutor.getInstance().diskIO().execute(new Runnable() {
+            @Override
+            public void run() {
+                final LiveData<List<MovieEntity>> movieEntities = mAppdatabase.movieDao().loadFavouriteMovieById(movieId);
+                        movieEntities.observe(MovieDetails.this, new Observer<List<MovieEntity>>() {
+                                    @Override
+                                    public void onChanged(@Nullable List<MovieEntity> movieEntities) {
+
+                                        if (movieEntities.size() < 0){
+                                            movieIsFavourited = false;
+                                            //favFab.setImageResource(R.drawable.ic_favorite_border);
+                                            saveFavorite();
+                                        }else {
+                                            movieIsFavourited = true;
+                                            //favFab.setImageResource(R.drawable.ic_favorite);
+                                            deleteFavorite(movie_id);
+
+                                        }
+
+                                    }
+                                }
+
+                        );
+            }
+        });
+
+    }
+
+
+    public void saveFavorite(){
+        Double pop = Double.parseDouble(moviePopularity);
+        Double voteAverage = Double.parseDouble(movieVoteAverage);
+
+
+       final MovieEntity movieEntity = new MovieEntity(id, movie_id, voteAverage, pop, movieTitle, moviePoster,
+               movieLanguage, movieBackdrop, movieOverview, movieReleaseDate);
+        AppExecutor.getInstance().diskIO().execute(new Runnable() {
+            @Override
+            public void run() {
+                mAppdatabase.movieDao().insertFavouriteMovie(movieEntity);
+            }
+        });
+    }
+
+
+
+    private void deleteFavorite(final int movie_id){
+        AppExecutor.getInstance().diskIO().execute(new Runnable() {
+            @Override
+            public void run() {
+                mAppdatabase.movieDao().deleteFavouriteMovieById (movie_id);
+            }
+        });
+    }
 
 
     @Override

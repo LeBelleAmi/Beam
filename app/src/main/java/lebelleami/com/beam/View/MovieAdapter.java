@@ -18,7 +18,7 @@ import java.util.List;
 
 import lebelleami.com.beam.Utils.Url;
 import lebelleami.com.beam.Model.MovieData;
-import lebelleami.com.beam.MovieDetails;
+import lebelleami.com.beam.Controller.MovieDetails;
 import lebelleami.com.beam.R;
 
 public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieViewHolder>{

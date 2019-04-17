@@ -1,4 +1,4 @@
-package lebelleami.com.beam;
+package lebelleami.com.beam.Controller;
 
 import android.content.res.Configuration;
 import android.graphics.Color;
@@ -20,6 +20,7 @@ import java.util.List;
 
 import lebelleami.com.beam.Api.Client;
 import lebelleami.com.beam.Api.Service;
+import lebelleami.com.beam.R;
 import lebelleami.com.beam.Utils.Url;
 import lebelleami.com.beam.Model.Tv;
 import lebelleami.com.beam.View.TvAdapter;

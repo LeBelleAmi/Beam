@@ -1,4 +1,4 @@
-package lebelleami.com.beam;
+package lebelleami.com.beam.Controller;
 
 import android.content.res.Configuration;
 import android.graphics.Color;
@@ -20,26 +20,27 @@ import java.util.List;
 
 import lebelleami.com.beam.Api.Client;
 import lebelleami.com.beam.Api.Service;
+import lebelleami.com.beam.R;
 import lebelleami.com.beam.Utils.Url;
-import lebelleami.com.beam.Model.Tv;
-import lebelleami.com.beam.View.TvAdapter;
-import lebelleami.com.beam.Model.TvData;
+import lebelleami.com.beam.Model.Movie;
+import lebelleami.com.beam.Model.MovieData;
+import lebelleami.com.beam.View.MovieAdapter;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class SeriesFragment extends Fragment {
+public class UpcomingFragment extends Fragment {
 
     View view;
 
     private RecyclerView recyclerView;
     /*recycler view layout manager*/
     LinearLayoutManager llm;
-    private TvAdapter tvAdapter;
-    private List<TvData> tvData;
-    Tv tv;
+    private MovieAdapter movieAdapter;
+    private List<MovieData> movieDataList;
+    Movie movie;
 
-    public SeriesFragment(){
+    public UpcomingFragment(){
 
     }
 
@@ -49,9 +50,8 @@ public class SeriesFragment extends Fragment {
         view = inflater.inflate(R.layout.list_layout_fragment, container, false);
 
         initViews();
-        loadTvData();
-        tvData = new ArrayList<>();
-
+        loadMovieData();
+        movieDataList = new ArrayList<>();
 
         return view;
     }
@@ -64,7 +64,7 @@ public class SeriesFragment extends Fragment {
         llm = new LinearLayoutManager(getActivity().getApplicationContext());
         llm.setOrientation(LinearLayoutManager.VERTICAL);
         recyclerView.setLayoutManager(llm);
-        recyclerView.setAdapter(tvAdapter);
+        recyclerView.setAdapter(movieAdapter);
 
         if (getActivity().getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
             recyclerView.setLayoutManager(new GridLayoutManager(getActivity().getApplicationContext(), 2));
@@ -75,30 +75,30 @@ public class SeriesFragment extends Fragment {
     }
 
 
-    private void loadTvData() {
+    private void loadMovieData() {
         try {
             Service apiService =
                     Client.getClient().create(Service.class);
-            Call<Tv> call = apiService.getPopularTvData(Url.API_KEY);
-            call.enqueue(new Callback<Tv>() {
+            Call<Movie> call = apiService.getUpcomingMovieData(Url.API_KEY);
+            call.enqueue(new Callback<Movie>() {
                 @Override
-                public void onResponse(Call<Tv> call, Response<Tv> response) {
+                public void onResponse(Call<Movie> call, Response<Movie> response) {
                     if (response.isSuccessful()) {
 
                         //Log.i(TAG, "movies: " + response.body().getResults().toString());
                         //Toast.makeText(getActivity().getApplicationContext(), response.body().toString() + "string", Toast.LENGTH_LONG).show();
-                        tv = response.body();
-                        List<TvData> tvList = tv.getResults();
-                        tvAdapter = new TvAdapter(getActivity().getApplicationContext(), tvList);
+                        movie = response.body();
+                        List<MovieData> movieList = movie.getResults();
+                        movieAdapter = new MovieAdapter(getActivity().getApplicationContext(), movieList);
                         recyclerView.smoothScrollToPosition(0);
-                        recyclerView.setAdapter(tvAdapter);
-                        tvAdapter.notifyDataSetChanged();
+                        recyclerView.setAdapter(movieAdapter);
+                        movieAdapter.notifyDataSetChanged();
                     }
                 }
 
 
                 @Override
-                public void onFailure(Call<Tv> call, Throwable t) {
+                public void onFailure(Call<Movie> call, Throwable t) {
                     Log.d("Error", t.getMessage());
                     // showing snack bar with response failure option
                     Snackbar snackbar = Snackbar
@@ -107,7 +107,7 @@ public class SeriesFragment extends Fragment {
                         @Override
                         public void onClick(View view) {
                             // refresh is selected, refresh the app
-                            loadTvData();
+                            loadMovieData();
                         }
                     });
                     snackbar.setActionTextColor(Color.YELLOW);
@@ -123,5 +123,4 @@ public class SeriesFragment extends Fragment {
             Toast.makeText(getActivity().getApplicationContext(), e.toString(), Toast.LENGTH_SHORT).show();
         }
     }
-
 }

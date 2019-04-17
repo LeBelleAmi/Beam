@@ -1,7 +1,13 @@
-package lebelleami.com.beam;
+package lebelleami.com.beam.Controller;
 
+import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.res.Configuration;
 import android.graphics.Color;
+import android.net.ConnectivityManager;
+import android.net.NetworkCapabilities;
+import android.net.NetworkInfo;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
@@ -20,6 +26,7 @@ import java.util.List;
 
 import lebelleami.com.beam.Api.Client;
 import lebelleami.com.beam.Api.Service;
+import lebelleami.com.beam.R;
 import lebelleami.com.beam.Utils.Url;
 import lebelleami.com.beam.Model.Movie;
 import lebelleami.com.beam.Model.MovieData;
@@ -28,7 +35,7 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class UpcomingFragment extends Fragment {
+public class MoviesFragment extends Fragment {
 
     View view;
 
@@ -38,18 +45,19 @@ public class UpcomingFragment extends Fragment {
     private MovieAdapter movieAdapter;
     private List<MovieData> movieDataList;
     Movie movie;
+    private boolean connected;
 
-    public UpcomingFragment(){
+
+    public MoviesFragment() {
 
     }
 
     @Nullable
     @Override
-    public View onCreateView (LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState){
+    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         view = inflater.inflate(R.layout.list_layout_fragment, container, false);
-
+        connected();
         initViews();
-        loadMovieData();
         movieDataList = new ArrayList<>();
 
         return view;
@@ -78,7 +86,7 @@ public class UpcomingFragment extends Fragment {
         try {
             Service apiService =
                     Client.getClient().create(Service.class);
-            Call<Movie> call = apiService.getUpcomingMovieData(Url.API_KEY);
+            Call<Movie> call = apiService.getPopularMovieData(Url.API_KEY);
             call.enqueue(new Callback<Movie>() {
                 @Override
                 public void onResponse(Call<Movie> call, Response<Movie> response) {
@@ -119,7 +127,63 @@ public class UpcomingFragment extends Fragment {
         } catch (Exception e) {
             Log.d("Error", e.getMessage());
 
-            Toast.makeText(getActivity().getApplicationContext(), e.toString(), Toast.LENGTH_SHORT).show();
+        Toast.makeText(getActivity().getApplicationContext(), e.toString(), Toast.LENGTH_SHORT).show();
+    }
+    }
+
+
+    private void connected() {
+        connected = isNetworkConnected(getActivity().getApplicationContext());
+        if (!connected) {
+            // showing snack bar with network option
+            Snackbar snackbar = Snackbar
+                    .make(getActivity().findViewById(R.id.main_content), "You seem to be Offline, please check connection!", Snackbar.LENGTH_INDEFINITE);
+            snackbar.setAction("RETRY", new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    // retry is selected, refresh the app
+                    loadMovieData();
+                }
+            });
+            snackbar.setActionTextColor(Color.YELLOW);
+
+            View snackbarView = snackbar.getView();
+            snackbarView.setBackgroundColor(getResources().getColor(R.color.colorAccent));
+            snackbar.show();
+        } else {
+            loadMovieData();
         }
     }
+
+
+    public static boolean isNetworkConnected(Context context) {
+        boolean result = false;
+        ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            if (cm != null) {
+                NetworkCapabilities capabilities = cm.getNetworkCapabilities(cm.getActiveNetwork());
+                if (capabilities != null) {
+                    if (capabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI)) {
+                        result = true;
+                    } else if (capabilities.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR)) {
+                        result = true;
+                    }
+                }
+            }
+        } else {
+            if (cm != null) {
+                NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
+                if (activeNetwork != null) {
+                    // connected to the internet
+                    if (activeNetwork.getType() == ConnectivityManager.TYPE_WIFI) {
+                        result = true;
+                    } else if (activeNetwork.getType() == ConnectivityManager.TYPE_MOBILE) {
+                        result = true;
+                    }
+                }
+            }
+        }
+        return result;
+    }
+
 }
