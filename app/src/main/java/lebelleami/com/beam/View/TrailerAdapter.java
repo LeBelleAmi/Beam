@@ -5,19 +5,25 @@ import android.content.Intent;
 import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
+
 import java.util.List;
 
 import lebelleami.com.beam.Model.TrailerData;
 import lebelleami.com.beam.R;
+import lebelleami.com.beam.Utils.Url;
 
 public class TrailerAdapter extends RecyclerView.Adapter<TrailerAdapter.TrailerViewHolder> {
 
+
+    private final static String LOG_TAG = TrailerAdapter.class.getSimpleName();
     private Context context;
     private List<TrailerData> trailerDataList;
 
@@ -52,6 +58,9 @@ public class TrailerAdapter extends RecyclerView.Adapter<TrailerAdapter.TrailerV
     public void onBindViewHolder(@NonNull final TrailerAdapter.TrailerViewHolder trailerViewHolder, int i) {
         TrailerData trailerData = trailerDataList.get(i);
         trailerViewHolder.trailerTitle.setText(trailerData.getName());
+        String thumbnailUrl = "https://img.youtube.com/vi/" + trailerData.getKey() + "/0.jpg";
+        Glide.with(context).load(thumbnailUrl).into(trailerViewHolder.movieTrailer);
+        Log.i(LOG_TAG,"thumbnailUrl -> " + thumbnailUrl);
 
         trailerViewHolder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override

@@ -14,6 +14,7 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import com.bumptech.glide.Glide;
+
 import java.util.List;
 
 import lebelleami.com.beam.Utils.Url;
@@ -89,6 +90,8 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieViewHol
                 context.startActivity(intent);
             }
         });
+
+
     }
 
 
@@ -100,6 +103,7 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieViewHol
             return movieDataList.size();
         }
     }
+
 
 
     public class MovieViewHolder extends RecyclerView.ViewHolder {
@@ -120,8 +124,8 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieViewHol
             movieYear = itemView.findViewById(R.id.movie_year);
             movieTitle = itemView.findViewById(R.id.movie_title);
             movieRating = itemView.findViewById(R.id.movie_rating);
-
         }
+
 
     }
 }

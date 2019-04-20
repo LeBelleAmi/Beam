@@ -24,7 +24,7 @@ public class MovieData {
 
     public MovieData(Integer vote_count, Integer id, Boolean video, Double vote_average,
                      String title, Double popularity, String poster_path, String original_language, String original_title,
-                     List<Integer> genre_ids, String backdrop_path, Boolean adult, String overview, String release_sate,
+                     List<Integer> genre_ids, String backdrop_path, Boolean adult, String overview, String release_date,
                      Map<String, Object> additionalProperties) {
         this.vote_count = vote_count;
         this.id = id;

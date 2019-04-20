@@ -32,7 +32,7 @@
                 android:layout_weight="1"
                 android:scaleType="fitXY"
                 android:background="?attr/selectableItemBackgroundBorderless"
-                android:src="@drawable/ic_profile" />
+                app:srcCompat="@drawable/ic_profile" />
 
             <LinearLayout
                 android:id="@+id/cast_detail_container"

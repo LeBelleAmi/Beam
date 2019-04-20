@@ -11,7 +11,6 @@ import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.CardView;
-import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
@@ -28,6 +27,7 @@ import com.flaviofaria.kenburnsview.KenBurnsView;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Locale;
@@ -36,11 +36,10 @@ import lebelleami.com.beam.Api.Client;
 import lebelleami.com.beam.Api.Service;
 import lebelleami.com.beam.Database.AppDatabase;
 import lebelleami.com.beam.Database.MovieEntity;
-import lebelleami.com.beam.DatabaseViewModel.AddFavouriteMovieViewModel;
 import lebelleami.com.beam.DatabaseViewModel.AppExecutor;
-import lebelleami.com.beam.DatabaseViewModel.FavouriteMoviesViewModel;
 import lebelleami.com.beam.Model.MovieData;
 import lebelleami.com.beam.R;
+import lebelleami.com.beam.Utils.GenreHelper;
 import lebelleami.com.beam.Utils.Url;
 import lebelleami.com.beam.Model.Cast;
 import lebelleami.com.beam.View.CastAdapter;
@@ -68,6 +67,7 @@ public class MovieDetails extends AppCompatActivity {
     private List<TrailerData>trailerList;
     private List<ReviewData>reviewList;
     private List<CastData>castList;
+    private List<MovieData> movieDataList;
     MovieData movieData;
     Trailer trailer;
     Review review;
@@ -125,6 +125,15 @@ public class MovieDetails extends AppCompatActivity {
 
         final int movie_id = Integer.parseInt(movieId);
 
+        String replace = movieGenre.replace("[","");
+        String replace1 = replace.replace("]","");
+        List<String> arrayList = new ArrayList<String>    (Arrays.asList(replace1.split(",")));
+        List<Integer> movieGenreList = new ArrayList<Integer>();
+        for(String fav:arrayList){
+            movieGenreList.add(Integer.parseInt(fav.trim()));
+        }
+
+
         //set movie details info
         movietitle.setText(movieTitle);
         year.setText(getFormattedReleaseDate(movieReleaseDate));
@@ -133,6 +142,10 @@ public class MovieDetails extends AppCompatActivity {
         String langua = movieLanguage.toUpperCase();
         language.setText(langua);
         synopsis.setText(movieOverview);
+        genre.setText(GenreHelper.getGenreNamesList(movieGenreList));
+
+
+
         Glide.with(this).load(Url.posterUrl(moviePoster)).into(posterImg);
         //Glide.with(this).load(Url.posterUrlBackdrop(movieBackdrop)).into(backdropImg);
         Glide.with(this).load(Url.posterUrlBackdrop(movieBackdrop)).into(kbv);
@@ -486,4 +499,6 @@ public class MovieDetails extends AppCompatActivity {
         }
     }
 
+
 }
+

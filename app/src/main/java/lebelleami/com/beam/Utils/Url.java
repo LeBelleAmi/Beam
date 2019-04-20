@@ -35,4 +35,8 @@ public class Url {
         return "https://image.tmdb.org/t/p/h632/" + posterPath;
     }
 
+    public static String youtubeThumbnailUrl(String trailerKey) {
+        return "https://img.youtube.com/vi/%s/0.jpg" + trailerKey;
+    }
+
 }
