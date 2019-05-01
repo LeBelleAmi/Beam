@@ -21,6 +21,7 @@ public class Url {
     public static final String TRAILER_TV = "tv/";
     public static final String REVIEWS = "/reviews";
     public static final String CASTS = "/casts";
+    public static final String CREDITS = "/credits";
 
 
     public static String posterUrl(String posterPath) {
@@ -35,8 +36,9 @@ public class Url {
         return "https://image.tmdb.org/t/p/h632/" + posterPath;
     }
 
-    public static String youtubeThumbnailUrl(String trailerKey) {
-        return "https://img.youtube.com/vi/%s/0.jpg" + trailerKey;
+    public static String posterUrlSeason(String posterPath) {
+        return "https://image.tmdb.org/t/p/w500" + posterPath;
     }
+
 
 }
