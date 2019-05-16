@@ -8,6 +8,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.borjabravo.readmoretextview.ReadMoreTextView;
+
 import java.util.List;
 
 import lebelleami.com.beam.Model.ReviewData;
@@ -65,7 +67,8 @@ public class ReviewAdapter extends RecyclerView.Adapter<ReviewAdapter.ReviewView
 
 
     public class ReviewViewHolder extends RecyclerView.ViewHolder {
-        TextView reviewerName, reviewerText;
+        TextView reviewerName;
+        ReadMoreTextView reviewerText;
 
 
         public ReviewViewHolder (View itemView) {

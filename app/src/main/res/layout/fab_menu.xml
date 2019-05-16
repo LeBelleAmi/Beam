@@ -52,7 +52,7 @@
                 android:id="@+id/fabVideo"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:src="@drawable/ic_video"
+                app:srcCompat="@drawable/ic_video"
                 app:backgroundTint="@color/purple_dark"
                 app:fabSize="mini" />
 
@@ -95,7 +95,7 @@
                 android:id="@+id/fabTicket"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:src="@drawable/ic_ticket"
+                app:srcCompat="@drawable/ic_ticket"
                 app:backgroundTint="@color/purple_light"
                 app:fabSize="mini" />
 
@@ -138,7 +138,7 @@
                 android:id="@+id/fabPhoto"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:src="@drawable/ic_favorite"
+                app:srcCompat="@drawable/ic_favorite"
                 app:backgroundTint="@android:color/holo_purple"
                 app:fabSize="mini" />
 
@@ -181,7 +181,7 @@
                 android:id="@+id/fabWatchlistIcon"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:src="@drawable/ic_bookmark"
+                app:srcCompat="@drawable/ic_bookmark"
                 app:backgroundTint="@color/purple_final"
                 app:fabSize="mini" />
 
@@ -225,7 +225,7 @@
                 android:id="@+id/fabSettingIcon"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:src="@drawable/ic_settings"
+                app:srcCompat="@drawable/ic_settings"
                 app:backgroundTint="@color/purple_finaloone"
                 app:fabSize="mini" />
 
@@ -246,7 +246,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="bottom|end"
-                android:src="@drawable/ic_close"
+                app:srcCompat="@drawable/ic_close"
                 app:backgroundTint="?attr/colorAccent"
                 app:fabSize="normal" />
 

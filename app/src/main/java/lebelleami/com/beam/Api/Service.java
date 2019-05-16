@@ -17,35 +17,36 @@ public interface Service {
 
     //POPULAR MOVIES
     @GET(Url.TYPE_A)
-    Call<Movie> getPopularMovieData(@Query("api_key") String apikey);
+    //Call<Movie> getPopularMovieData(@Query("api_key") String apikey);
+    Call<Movie> getPopularMovieData(@Query("api_key") String apikey, @Query("page") int page);
 
 
     //THEATER MOVIES
     @GET(Url.TYPE_B)
-    Call<Movie> getTheaterMovieData(@Query("api_key") String apikey);
+    Call<Movie> getTheaterMovieData(@Query("api_key") String apikey , @Query("page") int page);
 
 
     //UPCOMING MOVIES
     @GET(Url.TYPE_C)
-    Call<Movie> getUpcomingMovieData(@Query("api_key") String apikey);
+    Call<Movie> getUpcomingMovieData(@Query("api_key") String apikey, @Query("page") int page);
 
 
     //TOP RATED MOVIES
     @GET(Url.TYPE_D)
-    Call<Movie> getTopRatedMovieData(@Query("api_key") String apikey);
+    Call<Movie> getTopRatedMovieData(@Query("api_key") String apikey , @Query("page") int page);
 
 
     //POPULAR TV SHOWS
     @GET(Url.TYPE_E)
-    Call<Tv> getPopularTvData(@Query("api_key") String apikey);
+    Call<Tv> getPopularTvData(@Query("api_key") String apikey , @Query("page") int page);
 
     //TOP RATED TV SHOWS
     @GET(Url.TYPE_F)
-    Call<Tv> getTopRatedTvData(@Query("api_key") String apikey);
+    Call<Tv> getTopRatedTvData(@Query("api_key") String apikey , @Query("page") int page);
 
     //TV SHOWS ON AIR TODAY
     @GET(Url.TYPE_G)
-    Call<Tv> getAiringTodayTvData(@Query("api_key") String apikey);
+    Call<Tv> getAiringTodayTvData(@Query("api_key") String apikey , @Query("page") int page);
 
     //Trailer
     //movie/{movie_id}/videos

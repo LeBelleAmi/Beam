@@ -43,9 +43,11 @@ public class Movie {
         return total_Pages;
     }
 
+
     public void setTotal_Pages(Integer total_Pages) {
         this.total_Pages = total_Pages;
     }
+
 
     public List<MovieData> getResults() {
         return results;

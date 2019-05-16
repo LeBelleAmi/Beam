@@ -37,7 +37,7 @@
                 android:id="@+id/cast_detail_container"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
-                android:layout_weight="0.28"
+                android:layout_weight="0.35"
                 android:orientation="vertical"
                 android:padding="8dp"
                 android:background="@drawable/gradient_background">
