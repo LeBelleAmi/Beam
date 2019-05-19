@@ -139,7 +139,7 @@ public class MovieDetails extends AppCompatActivity {
         movietitle.setText(movieTitle);
         year.setText(getFormattedReleaseDate(movieReleaseDate));
         rating.setText(movieVoteAverage + "/10");
-        reviews.setText(movieVoteCount);
+        reviews.setText(movieVoteCount + " Reviews");
         String langua = movieLanguage.toUpperCase();
         language.setText(langua);
         synopsis.setText(movieOverview);

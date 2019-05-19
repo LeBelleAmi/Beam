@@ -153,6 +153,7 @@
                     android:paddingRight="16dp"
                     android:paddingTop="24dp"
                     android:textAppearance="@style/TextAppearance.AppCompat.Title" />
+
                 <LinearLayout
                     style="@style/Widget.CardContentTwo"
                     android:layout_width="match_parent"
@@ -166,7 +167,7 @@
                         android:scrollbarSize="3dp"
                         android:scrollbarStyle="insideOverlay"
                         android:scrollbars="horizontal"
-                        tools:listitem="@layout/trailer_list_item"/>
+                        tools:listitem="@layout/trailer_list_item" />
                 </LinearLayout>
 
 
@@ -210,14 +211,14 @@
     <android.support.v7.widget.CardView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="@dimen/card_margin_end"
+        android:layout_marginBottom="8dp"
         android:layout_marginLeft="@dimen/card_margin"
         android:layout_marginRight="@dimen/card_margin">
 
         <LinearLayout
-            style="@style/Widget.CardContent"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:orientation="vertical"
             android:background="@color/colorBackgroundTwo">
 
             <TextView
@@ -225,7 +226,15 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="@string/cast"
+                android:paddingLeft="16dp"
+                android:paddingRight="16dp"
+                android:paddingTop="24dp"
                 android:textAppearance="@style/TextAppearance.AppCompat.Title" />
+
+        <LinearLayout
+            style="@style/Widget.CardContentTwo"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
 
             <android.support.v7.widget.RecyclerView
                 android:id="@+id/cast_list_view"
@@ -236,10 +245,19 @@
                 android:scrollbarStyle="insideOverlay"
                 android:scrollbars="horizontal"
                 tools:listitem="@layout/cast_list_item"/>
+        </LinearLayout>
 
         </LinearLayout>
 
     </android.support.v7.widget.CardView>
+
+    <Button
+        android:id="@+id/watchlist_button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:background="@color/colorAccent"
+        android:text="@string/addwatch" />
 
     </LinearLayout>
 
