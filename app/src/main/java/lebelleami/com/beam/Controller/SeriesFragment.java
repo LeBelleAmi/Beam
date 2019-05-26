@@ -15,6 +15,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
@@ -36,7 +38,8 @@ public class SeriesFragment extends Fragment {
     View view;
 
     private SwipeRefreshLayout swipeRefreshLayout;
-    LinearLayout load_more;
+    ProgressBar load_more;
+    TextView emptyState;
 
 
     private RecyclerView recyclerView;
@@ -50,9 +53,9 @@ public class SeriesFragment extends Fragment {
     // boolean for awaiting data loading
     private boolean loading = true;
     // The minimum amount of items to have below your current scroll position before loading more
-    private int visibleThreshold = 0;
+    private int visibleThreshold = 20;
 
-    private int firstVisibleItem, visibleItemCount, totalItemCount;
+    private int firstVisibleItem, visibleItemCount, totalItemCount, previousTotal = 0;
 
     public int current_page = 1;
 
@@ -66,6 +69,7 @@ public class SeriesFragment extends Fragment {
         view = inflater.inflate(R.layout.list_layout_fragment, container, false);
 
         load_more = view.findViewById(R.id.progress_bar);
+        emptyState = view.findViewById(R.id.empty_state);
         swipeRefreshLayout = view.findViewById(R.id.swipe_refresh);
 
         swipeRefreshLayout.setColorSchemeResources(R.color.colorAccent);
@@ -111,20 +115,23 @@ public class SeriesFragment extends Fragment {
 
             @Override
             public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+                //Get the integer values of the no of items in the screen, the total item available and the
+                //items already seen and save them in the corresponding variables.
+                visibleItemCount = llm.getChildCount();
+                totalItemCount = llm.getItemCount();
+                firstVisibleItem = llm.findFirstVisibleItemPosition();
+
                 if (dy > 0) //check for scroll down
                 {
-                    //Get the integer values of the no of items in the screen, the total item available and the
-                    //items already seen and save them in the corresponding variables.
-                    visibleItemCount = recyclerView.getChildCount();
-                    totalItemCount = llm.getItemCount();
-                    firstVisibleItem = llm.findFirstVisibleItemPosition();
 
                     //If loading is true as you scroll down, and you haven't gotten to the end
                     //of the list, assign loading to false.
-                    //if (loading && (totalItemCount > previousTotal)) {
-                    //  loading = false;
-                    //previousTotal = totalItemCount;
-                    //}
+                    //
+                    if (loading && (totalItemCount > previousTotal)) {
+                        loading = false;
+                        previousTotal = totalItemCount;
+
+                    }
 
                     //if loading is false and you are at the end of the list increment current_page
                     //by 1 and then check if you are not at the last page using the value in current_page
@@ -133,7 +140,7 @@ public class SeriesFragment extends Fragment {
                     if (loading && (totalItemCount - visibleItemCount)
                             <= (firstVisibleItem + visibleThreshold)) {
                         current_page ++;
-                        if (current_page < 20) {
+                        if (current_page < 10) {
                             //show the progress bar for reloading.
                             load_more.setVisibility(View.VISIBLE);
                             loadTvData();
@@ -157,7 +164,6 @@ public class SeriesFragment extends Fragment {
                 }
             }
         });
-
     }
 
 
@@ -173,6 +179,7 @@ public class SeriesFragment extends Fragment {
 
                         swipeRefreshLayout.setRefreshing(false);
                         load_more.setVisibility(View.GONE);
+                        emptyState.setVisibility(View.GONE);
 
                         //Log.i(TAG, "movies: " + response.body().getResults().toString());
                         //Toast.makeText(getActivity().getApplicationContext(), response.body().toString() + "string", Toast.LENGTH_LONG).show();
@@ -189,6 +196,7 @@ public class SeriesFragment extends Fragment {
                 @Override
                 public void onFailure(Call<Tv> call, Throwable t) {
                     Log.d("Error", t.getMessage());
+                    emptyState.setVisibility(View.VISIBLE);
                     // showing snack bar with response failure option
                     Snackbar snackbar = Snackbar
                             .make(getActivity().findViewById(R.id.main_content), "TV data loading failed, please refresh!", Snackbar.LENGTH_INDEFINITE);

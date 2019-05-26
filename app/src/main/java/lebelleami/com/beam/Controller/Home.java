@@ -152,7 +152,7 @@ public class Home extends AppCompatActivity {
         layoutFabSettings.setVisibility(View.INVISIBLE);
         layoutFabWatchlist.setVisibility(View.INVISIBLE);
         buttonFrame.setBackgroundResource(0);
-        fabMenu.setImageResource(R.drawable.ic_menu);
+        fabMenu.setImageResource(R.drawable.popcorn);
         fabExpanded = false;
     }
 

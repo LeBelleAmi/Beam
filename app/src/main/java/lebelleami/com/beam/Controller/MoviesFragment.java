@@ -20,6 +20,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
@@ -41,7 +43,8 @@ public class MoviesFragment extends Fragment {
     View view;
 
     private SwipeRefreshLayout swipeRefreshLayout;
-    LinearLayout load_more;
+    ProgressBar load_more;
+    TextView emptyState;
 
     private RecyclerView recyclerView;
     /*recycler view layout manager*/
@@ -55,14 +58,11 @@ public class MoviesFragment extends Fragment {
     // boolean for awaiting data loading
     private boolean loading = true;
     // The minimum amount of items to have below your current scroll position before loading more
-    private int visibleThreshold = 0;
+    private int visibleThreshold = 20;
 
-    private int firstVisibleItem, visibleItemCount, totalItemCount;
+    private int firstVisibleItem, visibleItemCount, totalItemCount, previousTotal = 0;
 
-    private int previousTotal = 0;
     public int current_page = 1;
-
-    private int totalPages;
 
     public MoviesFragment() {
 
@@ -74,6 +74,7 @@ public class MoviesFragment extends Fragment {
         view = inflater.inflate(R.layout.list_layout_fragment, container, false);
 
         load_more = view.findViewById(R.id.progress_bar);
+        emptyState = view.findViewById(R.id.empty_state);
         swipeRefreshLayout = view.findViewById(R.id.swipe_refresh);
 
         swipeRefreshLayout.setColorSchemeResources(R.color.colorAccent);
@@ -118,13 +119,14 @@ public class MoviesFragment extends Fragment {
 
             @Override
             public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
-                if (dy > 0) //check for scroll down
-                {
                     //Get the integer values of the no of items in the screen, the total item available and the
                     //items already seen and save them in the corresponding variables.
-                    visibleItemCount = recyclerView.getChildCount();
+                    visibleItemCount = llm.getChildCount();
                     totalItemCount = llm.getItemCount();
                     firstVisibleItem = llm.findFirstVisibleItemPosition();
+
+                if (dy > 0) //check for scroll down
+                {
 
                     //If loading is true as you scroll down, and you haven't gotten to the end
                     //of the list, assign loading to false.
@@ -142,7 +144,7 @@ public class MoviesFragment extends Fragment {
                     if (loading && (totalItemCount - visibleItemCount)
                             <= (firstVisibleItem + visibleThreshold)) {
                         current_page ++;
-                        if (current_page < 50) {
+                        if (current_page < 10) {
                             //show the progress bar for reloading.
                             load_more.setVisibility(View.VISIBLE);
                             loadMovieData();
@@ -182,12 +184,14 @@ public class MoviesFragment extends Fragment {
 
                         swipeRefreshLayout.setRefreshing(false);
                         load_more.setVisibility(View.GONE);
+                        emptyState.setVisibility(View.GONE);
 
                         //Log.i(TAG, "movies: " + response.body().getResults().toString());
                         //Toast.makeText(getActivity().getApplicationContext(), response.body().toString() + "string", Toast.LENGTH_LONG).show();
                         movie = response.body();
-                        //totalPages = response.body().getTotal_Pages();
                         List<MovieData> movieList = movie.getResults();
+                        Toast.makeText(getActivity().getApplicationContext(), current_page + "loaded", Toast.LENGTH_LONG).show();
+
 
                         movieAdapter = new MovieAdapter(getActivity().getApplicationContext(), movieList);
                         recyclerView.smoothScrollToPosition(0);
@@ -202,6 +206,7 @@ public class MoviesFragment extends Fragment {
                 public void onFailure(Call<Movie> call, Throwable t) {
                     Log.d("Error", t.getMessage());
                     // showing snack bar with response failure option
+                    emptyState.setVisibility(View.VISIBLE);
                     Snackbar snackbar = Snackbar
                             .make(getActivity().findViewById(R.id.main_content), "Movie data loading failed, please refresh!", Snackbar.LENGTH_INDEFINITE);
                     snackbar.setAction("REFRESH", new View.OnClickListener() {
@@ -230,6 +235,7 @@ public class MoviesFragment extends Fragment {
         connected = isNetworkConnected(getActivity().getApplicationContext());
         if (!connected) {
             // showing snack bar with network option
+            emptyState.setVisibility(View.VISIBLE);
             Snackbar snackbar = Snackbar
                     .make(getActivity().findViewById(R.id.main_content), "You seem to be Offline, please check connection!", Snackbar.LENGTH_INDEFINITE);
             snackbar.setAction("RETRY", new View.OnClickListener() {
@@ -245,6 +251,7 @@ public class MoviesFragment extends Fragment {
             snackbarView.setBackgroundColor(getResources().getColor(R.color.colorAccent));
             snackbar.show();
         } else {
+            emptyState.setVisibility(View.GONE);
             loadMovieData();
             swipeRefreshLayout.setRefreshing(false);
         }
