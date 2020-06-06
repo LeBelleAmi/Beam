@@ -33,8 +33,9 @@ dependencies {
     implementation 'com.squareup.retrofit2:retrofit:2.4.0'
     implementation 'com.squareup.retrofit2:converter-gson:2.4.0'
     implementation 'com.android.support:support-core-utils:28.0.0'
-    implementation 'com.flaviofaria:kenburnsview:1.0.6'
+    implementation 'com.flaviofaria:kenburnsview:1.0.7'
     implementation 'com.borjabravo:readmoretextview:2.1.0'
+    implementation 'com.github.ivbaranov:materialfavoritebutton:0.1.4'
 
     // Room components
     implementation "android.arch.persistence.room:runtime:1.1.1"

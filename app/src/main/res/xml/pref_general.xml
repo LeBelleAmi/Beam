@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    app:iconSpaceReserved="false">
+
+    <PreferenceCategory
+        android:title="@string/general">
+
+        <Preference
+            android:summary="@string/account_seetings"
+            android:title="@string/account"
+            app:iconSpaceReserved="false"/>
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        android:title="@string/player">
+
+        <ListPreference
+            android:defaultValue="@string/one"
+            android:entries="@array/pref_player_resolution"
+            android:entryValues="@array/pref_res_values"
+            android:key="@string/resolution"
+            android:title="@string/player_quality"
+            app:iconSpaceReserved="false"/>
+
+        <SwitchPreference
+            android:defaultValue="true"
+            android:key="@string/notify"
+            android:summaryOff="@string/notify_summary"
+            android:summaryOn="@string/notify_summary"
+            android:title="@string/movie_notification"
+            app:iconSpaceReserved="false"/>
+
+
+    </PreferenceCategory>
+
+    <PreferenceCategory android:title="@string/about_app">
+        <Preference
+            android:selectable="false"
+            android:summary="@string/about"
+            app:iconSpaceReserved="false"/>
+        <Preference
+            android:summary="@string/version"
+            android:title="@string/tittle_version"
+            app:iconSpaceReserved="false"/>
+        <Preference
+            android:title="@string/powered"
+            android:summary="@string/tmdb"
+            app:iconSpaceReserved="false">
+            <intent android:action="android.intent.action.VIEW"
+                android:data="@string/tmdb_link" />
+        </Preference>
+    </PreferenceCategory>
+
+    <PreferenceCategory android:title="@string/legal">
+        <Preference
+            android:selectable="false"
+            android:summary="@string/legal_notice"
+            app:iconSpaceReserved="false"/>
+        <Preference
+            android:summary="@string/privacy"
+            app:iconSpaceReserved="false">
+        </Preference>
+
+        <Preference
+            android:summary="@string/terms"
+            app:iconSpaceReserved="false">
+            <intent android:action="android.intent.action.VIEW"
+                android:data="@string/tmdb_link" />
+        </Preference>
+    </PreferenceCategory>
+
+    <PreferenceCategory android:title="@string/help_center">
+        <Preference
+            android:summary="@string/help"
+            app:iconSpaceReserved="false">
+        <intent android:action="android.intent.action.VIEW"
+            android:data="@string/email_link" >
+        <extra android:name="android.intent.extra.SUBJECT"
+            android:value="Help needed in Beam" />
+        <extra android:name="android.intent.extra.TEXT"
+            android:value="This is a help required email from Beam" />
+        </intent>
+        </Preference>
+
+        <Preference
+            android:summary="@string/feedback"
+            app:iconSpaceReserved="false">
+        <intent android:action="android.intent.action.VIEW"
+            android:data="@string/email_link" >
+        <extra android:name="android.intent.extra.SUBJECT"
+            android:value="Feedback from Beam" />
+        <extra android:name="android.intent.extra.TEXT"
+            android:value="This is a feedback email from Beam" />
+        </intent>
+        </Preference>
+    </PreferenceCategory>
+
+
+</PreferenceScreen>

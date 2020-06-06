@@ -1,8 +1,10 @@
 package lebelleami.com.beam.Controller;
 
+import android.annotation.SuppressLint;
 import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.Observer;
 import android.graphics.Color;
+import android.os.AsyncTask;
 import android.support.annotation.Nullable;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CollapsingToolbarLayout;
@@ -20,10 +22,11 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
-import com.borjabravo.readmoretextview.ReadMoreTextView;
 import com.bumptech.glide.Glide;
 import com.flaviofaria.kenburnsview.KenBurnsView;
+import com.github.ivbaranov.mfb.MaterialFavoriteButton;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -36,7 +39,7 @@ import java.util.Locale;
 import lebelleami.com.beam.Api.Client;
 import lebelleami.com.beam.Api.Service;
 import lebelleami.com.beam.Database.AppDatabase;
-import lebelleami.com.beam.Database.MovieEntity;
+import lebelleami.com.beam.Database.MovieEntry;
 import lebelleami.com.beam.DatabaseViewModel.AppExecutor;
 import lebelleami.com.beam.Model.MovieData;
 import lebelleami.com.beam.R;
@@ -59,6 +62,7 @@ public class MovieDetails extends AppCompatActivity {
 
     ImageView backdropImg, posterImg;
     KenBurnsView kbv;
+    MaterialFavoriteButton materialFavoriteButton;
     TextView movietitle, year, rating, reviews, language, movierating, genre, synopsis;
     CardView posterCard;
     RecyclerView trailerrecyclerView, reviewrecyclerView, castrecyclerView;
@@ -74,14 +78,15 @@ public class MovieDetails extends AppCompatActivity {
     Review review;
     Cast cast;
     LinearLayoutManager layoutManager, layoutManagerOne,layoutManagerTwo;
-    FloatingActionButton favFab;
-    boolean movieIsFavourited = false;
+    //FloatingActionButton favFab;
 
     //poster animation
     private static final int PERCENTAGE_TO_ANIMATE_POSTER = 20;
     private boolean mIsPosterShown = true;
 
     private AppDatabase mAppdatabase;
+    List<MovieEntry> entries = new ArrayList<>();
+
 
     String movieTitle, movieVoteAverage, movieReleaseDate, movieAdult, moviePopularity, movieLanguage,
             movieId, movieVoteCount, movieBackdrop, movieOverview, movieGenre, moviePoster;
@@ -106,7 +111,8 @@ public class MovieDetails extends AppCompatActivity {
         synopsis = findViewById(R.id.overview);
         posterCard = findViewById(R.id.movie_card1);
         kbv = findViewById(R.id.backdropOne);
-        favFab = findViewById(R.id.fav_button);
+        //favFab = findViewById(R.id.fav_button);
+        materialFavoriteButton = findViewById(R.id.favorite_button);
 
 
         //get items from the adapter intent and set in views
@@ -195,6 +201,12 @@ public class MovieDetails extends AppCompatActivity {
                             .scaleY(0).scaleX(0)
                             .setDuration(200)
                             .start();
+
+                    materialFavoriteButton.animate()
+                            .scaleY(0).scaleX(0)
+                            .setDuration(200)
+                            .start();
+
                 }
 
                 if (percentage <= PERCENTAGE_TO_ANIMATE_POSTER && !mIsPosterShown) {
@@ -203,60 +215,26 @@ public class MovieDetails extends AppCompatActivity {
                     posterCard.animate()
                             .scaleY(1).scaleX(1)
                             .start();
+
+                    materialFavoriteButton.animate()
+                            .scaleY(1).scaleX(1)
+                            .setDuration(200)
+                            .start();
                 }
             }
 
         });
-
-        checkIfMovieExistsInFavorite(movie_id);
-
-
+/*
         favFab.setOnClickListener(new View.OnClickListener() {
-                                      @Override
-                                      public void onClick(View view) {
-
-
-                                         if (movieIsFavourited == true){
-                                              favFab.setImageResource(R.drawable.ic_favorite);
-                                              saveFavorite();
-                                              // showing snack bar with favourite text
-                                              final Snackbar snackbar = Snackbar
-                                                      .make(findViewById(R.id.main_content), "Movie has been added to favourite list!", Snackbar.LENGTH_INDEFINITE);
-                                              snackbar.setAction("Dismiss", new View.OnClickListener() {
-                                                  @Override
-                                                  public void onClick(View view) {
-                                                      snackbar.dismiss();
-
-                                                          }
-                                              });
-                                             snackbar.setActionTextColor(Color.YELLOW);
-                                              View snackbarView = snackbar.getView();
-                                              snackbarView.setBackgroundColor(getResources().getColor(R.color.colorAccent));
-                                              snackbar.show();
-                                          }else{
-
-                                              favFab.setImageResource(R.drawable.ic_favorite_border);
-                                              int mMovieId = Integer.parseInt(movieId);
-                                              deleteFavorite(mMovieId);
-                                              // showing snack bar with favourite text
-                                              final Snackbar snackbar = Snackbar
-                                                      .make(findViewById(R.id.main_content), "Movie has been removed from favourite list!", Snackbar.LENGTH_INDEFINITE);
-                                              snackbar.setAction("Dismiss", new View.OnClickListener() {
-                                                  @Override
-                                                  public void onClick(View view) {
-                                                      snackbar.dismiss();
-                                                  }
-                                              });
-                                              snackbar.setActionTextColor(Color.YELLOW);
-                                              View snackbarView = snackbar.getView();
-                                              snackbarView.setBackgroundColor(getResources().getColor(R.color.colorAccent));
-                                              snackbar.show();
-
-                                          }
-                                      }
-                                  }
-
-        );
+            @Override
+            public void onClick(View view) {
+                if(movieIsFavourited){
+                    favFab.setImageResource(R.drawable.ic_favorite);
+                }else {
+                    favFab.setImageResource(R.drawable.ic_favorite_border);
+                }
+            }
+        });*/
 
         initializeTrailer();
         initializeReview();
@@ -264,6 +242,7 @@ public class MovieDetails extends AppCompatActivity {
         loadTrailer();
         loadReview();
         loadCast();
+        checkStatus(movieTitle);
 
     }
 
@@ -412,49 +391,18 @@ public class MovieDetails extends AppCompatActivity {
 
     }
 
-    // check if movie exist in favourite collections
-    private void checkIfMovieExistsInFavorite(final int movieId) {
-
-        AppExecutor.getInstance().diskIO().execute(new Runnable() {
-            @Override
-            public void run() {
-                final LiveData<List<MovieEntity>> movieEntities = mAppdatabase.movieDao().loadFavouriteMovieById(movieId);
-                        movieEntities.observe(MovieDetails.this, new Observer<List<MovieEntity>>() {
-                                    @Override
-                                    public void onChanged(@Nullable List<MovieEntity> movieEntities) {
-
-                                        if (movieEntities.size() < 0){
-                                            movieIsFavourited = false;
-                                            //favFab.setImageResource(R.drawable.ic_favorite_border);
-                                            saveFavorite();
-                                        }else {
-                                            movieIsFavourited = true;
-                                            //favFab.setImageResource(R.drawable.ic_favorite);
-                                            deleteFavorite(movie_id);
-
-                                        }
-
-                                    }
-                                }
-
-                        );
-            }
-        });
-
-    }
-
 
     public void saveFavorite(){
         Double pop = Double.parseDouble(moviePopularity);
         Double voteAverage = Double.parseDouble(movieVoteAverage);
 
 
-       final MovieEntity movieEntity = new MovieEntity(id, movie_id, voteAverage, pop, movieTitle, moviePoster,
+       final MovieEntry movieEntry = new MovieEntry(id, movie_id, voteAverage, pop, movieTitle, moviePoster,
                movieLanguage, movieBackdrop, movieOverview, movieReleaseDate);
         AppExecutor.getInstance().diskIO().execute(new Runnable() {
             @Override
             public void run() {
-                mAppdatabase.movieDao().insertFavouriteMovie(movieEntity);
+                mAppdatabase.movieDao().insertFavouriteMovie(movieEntry);
             }
         });
     }
@@ -469,6 +417,7 @@ public class MovieDetails extends AppCompatActivity {
             }
         });
     }
+
 
 
     @Override
@@ -500,6 +449,106 @@ public class MovieDetails extends AppCompatActivity {
         }
     }
 
+
+
+    @SuppressLint("StaticFieldLeak")
+    private void checkStatus(final String movieName){
+        new AsyncTask<Void, Void, Void>(){
+            @Override
+            protected Void doInBackground(Void... params){
+                entries.clear();
+                entries = mAppdatabase.movieDao().loadAll(movieName);
+                return null;
+            }
+            @Override
+            protected void onPostExecute(Void aVoid){
+                super.onPostExecute(aVoid);
+                if (entries.size() > 0){
+                                materialFavoriteButton.setFavorite(true);
+                                materialFavoriteButton.setOnFavoriteChangeListener(
+                                        new MaterialFavoriteButton.OnFavoriteChangeListener() {
+                                            @Override
+                                            public void onFavoriteChanged(MaterialFavoriteButton buttonView, boolean favorite) {
+                                                if (favorite == true) {
+                                                    saveFavorite();
+                                                    final Snackbar snackbar = Snackbar
+                                                            .make(findViewById(R.id.main_content), "Movie has been added to favourite list!", Snackbar.LENGTH_INDEFINITE);
+                                                    snackbar.setAction("Dismiss", new View.OnClickListener() {
+                                                        @Override
+                                                        public void onClick(View view) {
+                                                            snackbar.dismiss();
+
+                                                        }
+                                                    });
+                                                    snackbar.setActionTextColor(Color.YELLOW);
+                                                    View snackbarView = snackbar.getView();
+                                                    snackbarView.setBackgroundColor(getResources().getColor(R.color.colorAccent));
+                                                    snackbar.show();
+                                                } else {
+                                                    deleteFavorite(movie_id);
+                                                    final Snackbar snackbar = Snackbar
+                                                            .make(findViewById(R.id.main_content), "Movie has been removed to favourite list!", Snackbar.LENGTH_INDEFINITE);
+                                                    snackbar.setAction("Dismiss", new View.OnClickListener() {
+                                                        @Override
+                                                        public void onClick(View view) {
+                                                            snackbar.dismiss();
+
+                                                        }
+                                                    });
+                                                    snackbar.setActionTextColor(Color.YELLOW);
+                                                    View snackbarView = snackbar.getView();
+                                                    snackbarView.setBackgroundColor(getResources().getColor(R.color.colorAccent));
+                                                    snackbar.show();
+                                                }
+                                            }
+                                        });
+
+
+                            }else {
+                                materialFavoriteButton.setOnFavoriteChangeListener(
+                                        new MaterialFavoriteButton.OnFavoriteChangeListener() {
+                                            @Override
+                                            public void onFavoriteChanged(MaterialFavoriteButton buttonView, boolean favorite) {
+                                                if (favorite == true) {
+                                                    saveFavorite();
+                                                    final Snackbar snackbar = Snackbar
+                                                            .make(findViewById(R.id.main_content), "Movie has been added to favourite list!", Snackbar.LENGTH_INDEFINITE);
+                                                    snackbar.setAction("Dismiss", new View.OnClickListener() {
+                                                        @Override
+                                                        public void onClick(View view) {
+                                                            snackbar.dismiss();
+
+                                                        }
+                                                    });
+                                                    snackbar.setActionTextColor(Color.YELLOW);
+                                                    View snackbarView = snackbar.getView();
+                                                    snackbarView.setBackgroundColor(getResources().getColor(R.color.colorAccent));
+                                                    snackbar.show();
+                                                } else {
+                                                    int movie_id = getIntent().getExtras().getInt("id");
+                                                    deleteFavorite(movie_id);
+                                                    final Snackbar snackbar = Snackbar
+                                                            .make(findViewById(R.id.main_content), "Movie has been removed to favourite list!", Snackbar.LENGTH_INDEFINITE);
+                                                    snackbar.setAction("Dismiss", new View.OnClickListener() {
+                                                        @Override
+                                                        public void onClick(View view) {
+                                                            snackbar.dismiss();
+
+                                                        }
+                                                    });
+                                                    snackbar.setActionTextColor(Color.YELLOW);
+                                                    View snackbarView = snackbar.getView();
+                                                    snackbarView.setBackgroundColor(getResources().getColor(R.color.colorAccent));
+                                                    snackbar.show();
+
+                                                }
+                                            }
+                                        });
+                            }
+                        }
+
+                    }.execute();
+    }
 
 }
 

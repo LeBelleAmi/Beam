@@ -8,17 +8,19 @@ import lebelleami.com.beam.Database.AppDatabase;
 public class AddFavouriteMovieViewModelFactory extends ViewModelProvider.NewInstanceFactory {
 
     private final AppDatabase appDatabase;
-    private final int movieId;
+    private final int mMovieId;
 
-    public AddFavouriteMovieViewModelFactory(AppDatabase database, int mMovieId){
+    public AddFavouriteMovieViewModelFactory(AppDatabase database, int movieId){
         appDatabase = database;
-        movieId = mMovieId;
+        mMovieId = movieId;
 
     }
 
     @Override
     public <T extends ViewModel> T create(Class<T> modelClass){
         //no inspection unchecked
-        return (T) new AddFavouriteMovieViewModel(appDatabase, movieId);
+        return (T) new AddFavouriteMovieViewModel(appDatabase, mMovieId);
     }
 }
+
+

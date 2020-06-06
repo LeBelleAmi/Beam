@@ -8,28 +8,24 @@ import android.support.annotation.NonNull;
 import java.util.List;
 
 import lebelleami.com.beam.Database.AppDatabase;
-import lebelleami.com.beam.Database.MovieEntity;
+import lebelleami.com.beam.Database.MovieEntry;
 
 public class FavouriteMoviesViewModel extends AndroidViewModel{
 
+    // Constant for logging
+    private static final String TAG = FavouriteMoviesViewModel.class.getSimpleName();
     private AppDatabase appDatabase;
 
-    private LiveData<List<MovieEntity>> favouritemovies;
-    private LiveData<List<MovieEntity>> favouritemovie;
+    private LiveData<List<MovieEntry>> favouritemovie;
 
     public FavouriteMoviesViewModel (@NonNull Application application) {
         super(application);
 
-        favouritemovies = appDatabase.movieDao().getAllFavouriteMovies();
+        favouritemovie = appDatabase.movieDao().getAllFavouriteMovies();
     }
 
 
-    public LiveData<List<MovieEntity>> getMovies() {
-        return favouritemovies;
-    }
-
-    public LiveData<List<MovieEntity>> getFavouriteMovie(int mMovieId){
-        favouritemovie = appDatabase.movieDao().loadFavouriteMovieById(mMovieId);
+    public LiveData<List<MovieEntry>> getMovies() {
         return favouritemovie;
     }
 

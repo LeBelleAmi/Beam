@@ -7,6 +7,8 @@ import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.TabLayout;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -22,7 +24,6 @@ import lebelleami.com.beam.View.ViewPagerAdapter;
 public class Home extends AppCompatActivity {
 
     //private TabLayout tabLayout;
-    private AppBarLayout appBarLayout;
     //private ViewPager viewPager;
     private Toolbar toolbar;
     private CoordinatorLayout coordinatorLayout;
@@ -37,7 +38,6 @@ public class Home extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
 
-        appBarLayout = findViewById(R.id.appbar);
         fabMenu = this.findViewById(R.id.fabMenu);
         fabVideo = this.findViewById(R.id.fabVideo);
         fabTicket = this.findViewById(R.id.fabTicket);

@@ -12,6 +12,7 @@ import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -81,7 +82,7 @@ public class MoviesFragment extends Fragment {
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener(){
             @Override
             public void onRefresh(){
-                current_page = 1;
+                current_page += 1;
                 connected();
                 Toast.makeText(getActivity().getApplicationContext(), "Refreshing Beam", Toast.LENGTH_SHORT).show();
             }
@@ -110,6 +111,8 @@ public class MoviesFragment extends Fragment {
         } else {
             recyclerView.setLayoutManager(new GridLayoutManager(getActivity().getApplicationContext(), 4));
         }
+
+        recyclerView.setItemAnimator(new DefaultItemAnimator());
 
         recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
@@ -190,7 +193,7 @@ public class MoviesFragment extends Fragment {
                         //Toast.makeText(getActivity().getApplicationContext(), response.body().toString() + "string", Toast.LENGTH_LONG).show();
                         movie = response.body();
                         List<MovieData> movieList = movie.getResults();
-                        Toast.makeText(getActivity().getApplicationContext(), current_page + "loaded", Toast.LENGTH_LONG).show();
+                        //Toast.makeText(getActivity().getApplicationContext(), current_page + "loaded", Toast.LENGTH_LONG).show();
 
 
                         movieAdapter = new MovieAdapter(getActivity().getApplicationContext(), movieList);

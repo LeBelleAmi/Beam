@@ -6,17 +6,18 @@ import android.arch.lifecycle.ViewModel;
 import java.util.List;
 
 import lebelleami.com.beam.Database.AppDatabase;
-import lebelleami.com.beam.Database.MovieEntity;
+import lebelleami.com.beam.Database.MovieEntry;
 
 public class AddFavouriteMovieViewModel extends ViewModel {
 
-    private LiveData<List<MovieEntity>> movieEntity;
+    private LiveData<MovieEntry> movieEntry;
 
     public AddFavouriteMovieViewModel(AppDatabase database, int movieId){
-        movieEntity = database.movieDao().loadFavouriteMovieById(movieId);
+        movieEntry = database.movieDao().loadFavouriteMovieById(movieId);
     }
 
-    public LiveData<List<MovieEntity>> getMovies(){
-        return movieEntity;
+    public LiveData<MovieEntry> getMovies(){
+        return movieEntry;
     }
 }
+

@@ -12,25 +12,27 @@ import android.arch.persistence.room.Update;
 import java.util.List;
 
 @Dao
-
 public interface MovieDao {
 
     @Query("SELECT * FROM favourite_movies ORDER BY id")
-    LiveData<List<MovieEntity>> getAllFavouriteMovies();
+    LiveData<List<MovieEntry>> getAllFavouriteMovies();
 
+    @Query("SELECT * FROM favourite_movies WHERE title = :title")
+    List<MovieEntry> loadAll(String title);
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    void insertFavouriteMovie(MovieEntity movieEntity);
+    void insertFavouriteMovie(MovieEntry movieEntry);
 
     @Update(onConflict = OnConflictStrategy.REPLACE)
-    void updateFavouriteMovie(MovieEntity movieEntity);
+    void updateFavouriteMovie(MovieEntry movieEntry);
 
     @Delete
-    void deleteFavouriteMovie(MovieEntity movieEntity);
+    void deleteFavouriteMovie(MovieEntry movieEntry);
 
     @Query("SELECT * FROM favourite_movies WHERE id = :movieId")
-    LiveData<List<MovieEntity>> loadFavouriteMovieById(int movieId);
+    LiveData<MovieEntry> loadFavouriteMovieById(int movieId);
 
     @Query("DELETE FROM favourite_movies WHERE id = :movieId")
     void deleteFavouriteMovieById(int movieId);
 }
+

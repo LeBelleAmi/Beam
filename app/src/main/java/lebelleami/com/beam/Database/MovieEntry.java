@@ -9,7 +9,7 @@ import android.support.annotation.NonNull;
 
 
 @Entity(tableName = "favourite_movies")
-public class MovieEntity {
+public class MovieEntry {
 
     @PrimaryKey(autoGenerate = true)
     @NonNull
@@ -45,9 +45,9 @@ public class MovieEntity {
 
 
 
-    public MovieEntity(@NonNull Integer id, Integer movieId, Double vote_average, Double popularity, String title,
-                       String poster_path, String original_language, String backdrop_path,
-                       String overview, String release_date) {
+    public MovieEntry(@NonNull Integer id, Integer movieId, Double vote_average, Double popularity, String title,
+                      String poster_path, String original_language, String backdrop_path,
+                      String overview, String release_date) {
 
         this.id = id;
         this.movieId = movieId;
