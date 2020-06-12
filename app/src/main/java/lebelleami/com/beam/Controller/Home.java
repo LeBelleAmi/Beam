@@ -1,22 +1,19 @@
 package lebelleami.com.beam.Controller;
 
 import android.content.Intent;
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
-import android.support.design.widget.AppBarLayout;
-import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.TabLayout;
-import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
-import android.view.WindowManager;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.Toast;
+
+import java.util.Objects;
 
 import lebelleami.com.beam.R;
 import lebelleami.com.beam.View.ViewPagerAdapter;
@@ -26,7 +23,6 @@ public class Home extends AppCompatActivity {
     //private TabLayout tabLayout;
     //private ViewPager viewPager;
     private Toolbar toolbar;
-    private CoordinatorLayout coordinatorLayout;
     LinearLayout layoutFabVideo, layoutFabTicket, layoutFabFavourite, layoutFabSettings, layoutFabWatchlist, buttonFrame;
     FrameLayout fabframeLayout;
     FloatingActionButton fabMenu, fabVideo, fabTicket, fabFavourite, fabWatchlist, fabSettings;
@@ -57,14 +53,11 @@ public class Home extends AppCompatActivity {
         //When main Fab (Settings) is clicked, it expands if not expanded already.
         //Collapses if main FAB was open already.
         //This gives FAB (Settings) open/close behavior
-        fabMenu.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (fabExpanded == true){
-                    closeSubMenusFab();
-                } else {
-                    openSubMenusFab();
-                }
+        fabMenu.setOnClickListener(view -> {
+            if (fabExpanded){
+                closeSubMenusFab();
+            } else {
+                openSubMenusFab();
             }
         });
 
@@ -73,48 +66,29 @@ public class Home extends AppCompatActivity {
 
 
         //extra fab buttons
-        fabVideo.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Toast.makeText(getApplicationContext(),"Video", Toast.LENGTH_LONG).show();
-            }
+        fabVideo.setOnClickListener(view -> Toast.makeText(getApplicationContext(),"Video", Toast.LENGTH_LONG).show());
+
+        fabTicket.setOnClickListener(view -> Toast.makeText(getApplicationContext(),"Ticket", Toast.LENGTH_LONG).show());
+
+        fabWatchlist.setOnClickListener(view -> Toast.makeText(getApplicationContext(),"Watchlist", Toast.LENGTH_LONG).show());
+
+        fabFavourite.setOnClickListener(view -> {
+            Intent favouriteIntent = new Intent(Home.this, FavouriteActivity.class);
+            Home.this.startActivity(favouriteIntent);
+
         });
 
-        fabTicket.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Toast.makeText(getApplicationContext(),"Ticket", Toast.LENGTH_LONG).show();
-            }
-        });
+        fabSettings.setOnClickListener(view -> {
+            Intent settingsIntent = new Intent(Home.this, Settings.class);
+            Home.this.startActivity(settingsIntent);
 
-        fabWatchlist.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Toast.makeText(getApplicationContext(),"Watchlist", Toast.LENGTH_LONG).show();
-            }
-        });
-
-        fabFavourite.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Toast.makeText(getApplicationContext(),"Favourite", Toast.LENGTH_LONG).show();
-            }
-        });
-
-        fabSettings.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent settingsIntent = new Intent(Home.this, Settings.class);
-                Home.this.startActivity(settingsIntent);
-
-            }
         });
 
 
         //app toolbar
         toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        getSupportActionBar().setTitle("Beam");
+        Objects.requireNonNull(getSupportActionBar()).setTitle("Beam");
         getSupportActionBar().setDisplayHomeAsUpEnabled(false);
 
         ViewPager viewPager = findViewById(R.id.viewpager);

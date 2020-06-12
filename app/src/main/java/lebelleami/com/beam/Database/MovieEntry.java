@@ -11,10 +11,11 @@ import android.support.annotation.NonNull;
 @Entity(tableName = "favourite_movies")
 public class MovieEntry {
 
-    @PrimaryKey(autoGenerate = true)
     @NonNull
+    @PrimaryKey(autoGenerate = true)
     @ColumnInfo(name = "id")
-    private Integer id;
+    private Long id;
+
 
     @ColumnInfo(name = "movieid")
     private Integer movieId;
@@ -43,9 +44,23 @@ public class MovieEntry {
     @ColumnInfo(name = "release_date")
     private String release_date;
 
+    @Ignore
+    public MovieEntry(Integer movieId, Double vote_average, Double popularity, String title,
+                      String poster_path, String original_language, String backdrop_path,
+                      String overview, String release_date) {
 
+        this.movieId = movieId;
+        this.vote_average = vote_average;
+        this.popularity = popularity;
+        this.title = title;
+        this.poster_path = poster_path;
+        this.original_language = original_language;
+        this.backdrop_path = backdrop_path;
+        this.overview = overview;
+        this.release_date = release_date;
+    }
 
-    public MovieEntry(@NonNull Integer id, Integer movieId, Double vote_average, Double popularity, String title,
+    public MovieEntry(@NonNull Long id, Integer movieId, Double vote_average, Double popularity, String title,
                       String poster_path, String original_language, String backdrop_path,
                       String overview, String release_date) {
 
@@ -62,11 +77,12 @@ public class MovieEntry {
     }
 
 
-    public Integer getId() {
+    @NonNull
+    public Long getId() {
         return id;
     }
 
-    public void setId(Integer id) {
+    public void setId(@NonNull Long id) {
         this.id = id;
     }
 

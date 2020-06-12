@@ -16,7 +16,6 @@ public abstract class AppDatabase extends RoomDatabase{
     private static volatile AppDatabase sINSTANCE;
 
 
-
     public static AppDatabase getsINSTANCE(final Context context) {
         if (sINSTANCE == null) {
             synchronized (LOCK) {

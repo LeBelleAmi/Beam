@@ -1,14 +1,11 @@
 package lebelleami.com.beam.Controller;
 
 import android.annotation.SuppressLint;
-import android.arch.lifecycle.LiveData;
-import android.arch.lifecycle.Observer;
+import android.arch.lifecycle.ViewModelProviders;
 import android.graphics.Color;
 import android.os.AsyncTask;
-import android.support.annotation.Nullable;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CollapsingToolbarLayout;
-import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -22,7 +19,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.flaviofaria.kenburnsview.KenBurnsView;
@@ -35,13 +31,13 @@ import java.util.Arrays;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
 
 import lebelleami.com.beam.Api.Client;
 import lebelleami.com.beam.Api.Service;
-import lebelleami.com.beam.Database.AppDatabase;
 import lebelleami.com.beam.Database.MovieEntry;
-import lebelleami.com.beam.DatabaseViewModel.AppExecutor;
-import lebelleami.com.beam.Model.MovieData;
+import lebelleami.com.beam.DatabaseViewModel.FavouriteMoviesViewModel;
+import lebelleami.com.beam.DatabaseViewModel.FavouriteMoviesViewModelFactory;
 import lebelleami.com.beam.R;
 import lebelleami.com.beam.Utils.GenreHelper;
 import lebelleami.com.beam.Utils.Url;
@@ -60,7 +56,8 @@ import retrofit2.Response;
 
 public class MovieDetails extends AppCompatActivity {
 
-    ImageView backdropImg, posterImg;
+    private FavouriteMoviesViewModel favouriteMoviesViewModel;
+    ImageView posterImg;
     KenBurnsView kbv;
     MaterialFavoriteButton materialFavoriteButton;
     TextView movietitle, year, rating, reviews, language, movierating, genre, synopsis;
@@ -69,37 +66,33 @@ public class MovieDetails extends AppCompatActivity {
     private ReviewAdapter reviewAdapter;
     private TrailerAdapter trailerAdapter;
     private CastAdapter castAdapter;
-    private List<TrailerData>trailerList;
-    private List<ReviewData>reviewList;
-    private List<CastData>castList;
-    private List<MovieData> movieDataList;
-    MovieData movieData;
+    private List<TrailerData> trailerList;
+    private List<ReviewData> reviewList;
+    private List<CastData> castList;
+    List<MovieEntry> entries;
     Trailer trailer;
     Review review;
     Cast cast;
-    LinearLayoutManager layoutManager, layoutManagerOne,layoutManagerTwo;
-    //FloatingActionButton favFab;
+    LinearLayoutManager layoutManager, layoutManagerOne, layoutManagerTwo;
 
     //poster animation
     private static final int PERCENTAGE_TO_ANIMATE_POSTER = 20;
     private boolean mIsPosterShown = true;
 
-    private AppDatabase mAppdatabase;
-    List<MovieEntry> entries = new ArrayList<>();
-
 
     String movieTitle, movieVoteAverage, movieReleaseDate, movieAdult, moviePopularity, movieLanguage,
             movieId, movieVoteCount, movieBackdrop, movieOverview, movieGenre, moviePoster;
-    int movie_id, id;
+
+    int movie_Id;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        FavouriteMoviesViewModelFactory favouriteMoviesViewModelFactory = FavouriteMoviesViewModelFactory.createFactory(this);
+        favouriteMoviesViewModel = ViewModelProviders.of(this, favouriteMoviesViewModelFactory).get(FavouriteMoviesViewModel.class);
         setContentView(R.layout.activity_movie_details);
 
-        mAppdatabase = AppDatabase.getsINSTANCE(getApplicationContext());
-
-        //backdropImg = findViewById(R.id.backdrop);
+        entries = new ArrayList<>();
         posterImg = findViewById(R.id.movie_thumbnail_image2);
         movietitle = findViewById(R.id.movie_title1);
         year = findViewById(R.id.movie_year1);
@@ -111,7 +104,6 @@ public class MovieDetails extends AppCompatActivity {
         synopsis = findViewById(R.id.overview);
         posterCard = findViewById(R.id.movie_card1);
         kbv = findViewById(R.id.backdropOne);
-        //favFab = findViewById(R.id.fav_button);
         materialFavoriteButton = findViewById(R.id.favorite_button);
 
 
@@ -130,18 +122,20 @@ public class MovieDetails extends AppCompatActivity {
         movieGenre = data.getString("movieGenre");
         moviePoster = data.getString("moviePoster");
 
-        final int movie_id = Integer.parseInt(movieId);
 
-        String replace = movieGenre.replace("[","");
-        String replace1 = replace.replace("]","");
-        List<String> arrayList = new ArrayList<String>    (Arrays.asList(replace1.split(",")));
+        String replace = movieGenre.replace("[", "");
+        String replace1 = replace.replace("]", "");
+        List<String> arrayList = new ArrayList<>(Arrays.asList(replace1.split(",")));
         List<Integer> movieGenreList = new ArrayList<Integer>();
-        for(String fav:arrayList){
+        for (String fav : arrayList) {
             movieGenreList.add(Integer.parseInt(fav.trim()));
         }
 
 
         //set movie details info
+        assert movieId != null;
+        movie_Id = Integer.parseInt(movieId);
+
         movietitle.setText(movieTitle);
         year.setText(getFormattedReleaseDate(movieReleaseDate));
         rating.setText(movieVoteAverage + "/10");
@@ -152,9 +146,7 @@ public class MovieDetails extends AppCompatActivity {
         genre.setText(GenreHelper.getGenreNamesList(movieGenreList));
 
 
-
         Glide.with(this).load(Url.posterUrl(moviePoster)).into(posterImg);
-        //Glide.with(this).load(Url.posterUrlBackdrop(movieBackdrop)).into(backdropImg);
         Glide.with(this).load(Url.posterUrlBackdrop(movieBackdrop)).into(kbv);
 
         // Find the toolbar view inside the activity layout
@@ -224,17 +216,6 @@ public class MovieDetails extends AppCompatActivity {
             }
 
         });
-/*
-        favFab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if(movieIsFavourited){
-                    favFab.setImageResource(R.drawable.ic_favorite);
-                }else {
-                    favFab.setImageResource(R.drawable.ic_favorite_border);
-                }
-            }
-        });*/
 
         initializeTrailer();
         initializeReview();
@@ -242,13 +223,11 @@ public class MovieDetails extends AppCompatActivity {
         loadTrailer();
         loadReview();
         loadCast();
-        checkStatus(movieTitle);
-
+        checkFavouriteStatus(movieTitle);
     }
 
 
-
-    private void initializeTrailer(){
+    private void initializeTrailer() {
         trailerList = new ArrayList<>();
         trailerAdapter = new TrailerAdapter(this, trailerList);
         trailerrecyclerView = findViewById(R.id.trailer_list_view);
@@ -264,13 +243,14 @@ public class MovieDetails extends AppCompatActivity {
 
     private void loadTrailer() {
         String movieId = getIntent().getBundleExtra("items").getString("movieId");
+        assert movieId != null;
         int trailerId = Integer.parseInt(movieId);
 
-        try{
+        try {
 
             Client client = new Client();
             Service apiService =
-                    client.getClient().create(Service.class);
+                    Client.getClient().create(Service.class);
 
 
             Call<Trailer> call = apiService.getMovieTrailerData(trailerId, Url.API_KEY);
@@ -279,19 +259,22 @@ public class MovieDetails extends AppCompatActivity {
                 @Override
                 public void onResponse(Call<Trailer> call, Response<Trailer> response) {
                     trailer = response.body();
+                    assert trailer != null;
                     List<TrailerData> trailerDataList = trailer.getResults();
                     //Log.i("trailer test:", response.body().toString());
                     trailerAdapter = new TrailerAdapter(getApplicationContext(), trailerDataList);
                     trailerrecyclerView.smoothScrollToPosition(0);
                     trailerrecyclerView.setAdapter(trailerAdapter);
-                    trailerAdapter.notifyDataSetChanged();}
+                    trailerAdapter.notifyDataSetChanged();
+                }
 
                 @Override
                 public void onFailure(Call<Trailer> call, Throwable t) {
                     Log.e("Error", t.getMessage());
                 }
             });
-        }catch (Exception e){
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 
@@ -310,13 +293,14 @@ public class MovieDetails extends AppCompatActivity {
 
     private void loadReview() {
         String movieId = getIntent().getBundleExtra("items").getString("movieId");
+        assert movieId != null;
         int reviewId = Integer.parseInt(movieId);
 
-        try{
+        try {
 
             Client client = new Client();
             Service apiService =
-                    client.getClient().create(Service.class);
+                    Client.getClient().create(Service.class);
 
 
             Call<Review> call = apiService.getReviewsData(reviewId, Url.API_KEY);
@@ -325,19 +309,22 @@ public class MovieDetails extends AppCompatActivity {
                 @Override
                 public void onResponse(Call<Review> call, Response<Review> response) {
                     review = response.body();
+                    assert review != null;
                     List<ReviewData> reviewDataList = review.getResults();
                     //Log.i("review test:", response.body().toString());
                     reviewAdapter = new ReviewAdapter(getApplicationContext(), reviewDataList);
                     reviewrecyclerView.smoothScrollToPosition(0);
                     reviewrecyclerView.setAdapter(reviewAdapter);
-                    reviewAdapter.notifyDataSetChanged();}
+                    reviewAdapter.notifyDataSetChanged();
+                }
 
                 @Override
                 public void onFailure(Call<Review> call, Throwable t) {
                     Log.e("Error", t.getMessage());
                 }
             });
-        }catch (Exception e){
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 
@@ -359,13 +346,14 @@ public class MovieDetails extends AppCompatActivity {
 
     private void loadCast() {
         String movieId = getIntent().getBundleExtra("items").getString("movieId");
+        assert movieId != null;
         int castId = Integer.parseInt(movieId);
 
-        try{
+        try {
 
             Client client = new Client();
             Service apiService =
-                    client.getClient().create(Service.class);
+                    Client.getClient().create(Service.class);
 
 
             Call<Cast> call = apiService.getCastsData(castId, Url.API_KEY);
@@ -374,50 +362,40 @@ public class MovieDetails extends AppCompatActivity {
                 @Override
                 public void onResponse(Call<Cast> call, Response<Cast> response) {
                     cast = response.body();
+                    assert cast != null;
                     List<CastData> castDataList = cast.getCast();
                     //Log.i("cast test:", response.body().toString());
                     castAdapter = new CastAdapter(getApplicationContext(), castDataList);
                     castrecyclerView.smoothScrollToPosition(0);
                     castrecyclerView.setAdapter(castAdapter);
-                    castAdapter.notifyDataSetChanged();}
+                    castAdapter.notifyDataSetChanged();
+                }
 
                 @Override
                 public void onFailure(Call<Cast> call, Throwable t) {
                     Log.e("Error", t.getMessage());
                 }
             });
-        }catch (Exception e){
+        } catch (Exception e) {
+            e.printStackTrace();
         }
 
     }
 
+    //save favourite movie
+    public void saveFavorite() {
+        double pop = Double.parseDouble(moviePopularity);
+        double voteAverage = Double.parseDouble(movieVoteAverage);
 
-    public void saveFavorite(){
-        Double pop = Double.parseDouble(moviePopularity);
-        Double voteAverage = Double.parseDouble(movieVoteAverage);
-
-
-       final MovieEntry movieEntry = new MovieEntry(id, movie_id, voteAverage, pop, movieTitle, moviePoster,
-               movieLanguage, movieBackdrop, movieOverview, movieReleaseDate);
-        AppExecutor.getInstance().diskIO().execute(new Runnable() {
-            @Override
-            public void run() {
-                mAppdatabase.movieDao().insertFavouriteMovie(movieEntry);
-            }
-        });
+        favouriteMoviesViewModel.saveFavMovie(movie_Id, voteAverage, pop, movieTitle, moviePoster,
+                movieLanguage, movieBackdrop, movieOverview, movieReleaseDate);
     }
 
 
-
-    private void deleteFavorite(final int movie_id){
-        AppExecutor.getInstance().diskIO().execute(new Runnable() {
-            @Override
-            public void run() {
-                mAppdatabase.movieDao().deleteFavouriteMovieById (movie_id);
-            }
-        });
+    //delete favourite movie
+    private void deleteFavorite(int movie_id) {
+        favouriteMoviesViewModel.deleteById(movie_id);
     }
-
 
 
     @Override
@@ -442,7 +420,8 @@ public class MovieDetails extends AppCompatActivity {
         try {
             Calendar calendar = Calendar.getInstance();
             calendar.setTime(DATE_FORMAT.parse(releaseDate));
-            return calendar.getDisplayName(Calendar.MONTH, Calendar.LONG, Locale.ENGLISH) + " "+calendar.get(Calendar.DAY_OF_MONTH) +", " + calendar.get(Calendar.YEAR);
+            return calendar.getDisplayName(Calendar.MONTH, Calendar.LONG, Locale.ENGLISH) + " "
+                    + calendar.get(Calendar.DAY_OF_MONTH) + ", " + calendar.get(Calendar.YEAR);
         } catch (ParseException e) {
             Log.e("Error", e.getMessage());
             return "";
@@ -450,105 +429,72 @@ public class MovieDetails extends AppCompatActivity {
     }
 
 
-
     @SuppressLint("StaticFieldLeak")
-    private void checkStatus(final String movieName){
-        new AsyncTask<Void, Void, Void>(){
+    private void checkFavouriteStatus(String movieTitle) {
+        new AsyncTask<Void, Void, Void>() {
             @Override
-            protected Void doInBackground(Void... params){
+            protected Void doInBackground(Void... params) {
                 entries.clear();
-                entries = mAppdatabase.movieDao().loadAll(movieName);
+                entries = favouriteMoviesViewModel.getListOfFavMovies(movieTitle);
                 return null;
             }
+
             @Override
-            protected void onPostExecute(Void aVoid){
+            protected void onPostExecute(Void aVoid) {
                 super.onPostExecute(aVoid);
-                if (entries.size() > 0){
-                                materialFavoriteButton.setFavorite(true);
-                                materialFavoriteButton.setOnFavoriteChangeListener(
-                                        new MaterialFavoriteButton.OnFavoriteChangeListener() {
-                                            @Override
-                                            public void onFavoriteChanged(MaterialFavoriteButton buttonView, boolean favorite) {
-                                                if (favorite == true) {
-                                                    saveFavorite();
-                                                    final Snackbar snackbar = Snackbar
-                                                            .make(findViewById(R.id.main_content), "Movie has been added to favourite list!", Snackbar.LENGTH_INDEFINITE);
-                                                    snackbar.setAction("Dismiss", new View.OnClickListener() {
-                                                        @Override
-                                                        public void onClick(View view) {
-                                                            snackbar.dismiss();
-
-                                                        }
-                                                    });
-                                                    snackbar.setActionTextColor(Color.YELLOW);
-                                                    View snackbarView = snackbar.getView();
-                                                    snackbarView.setBackgroundColor(getResources().getColor(R.color.colorAccent));
-                                                    snackbar.show();
-                                                } else {
-                                                    deleteFavorite(movie_id);
-                                                    final Snackbar snackbar = Snackbar
-                                                            .make(findViewById(R.id.main_content), "Movie has been removed to favourite list!", Snackbar.LENGTH_INDEFINITE);
-                                                    snackbar.setAction("Dismiss", new View.OnClickListener() {
-                                                        @Override
-                                                        public void onClick(View view) {
-                                                            snackbar.dismiss();
-
-                                                        }
-                                                    });
-                                                    snackbar.setActionTextColor(Color.YELLOW);
-                                                    View snackbarView = snackbar.getView();
-                                                    snackbarView.setBackgroundColor(getResources().getColor(R.color.colorAccent));
-                                                    snackbar.show();
-                                                }
-                                            }
-                                        });
-
-
-                            }else {
-                                materialFavoriteButton.setOnFavoriteChangeListener(
-                                        new MaterialFavoriteButton.OnFavoriteChangeListener() {
-                                            @Override
-                                            public void onFavoriteChanged(MaterialFavoriteButton buttonView, boolean favorite) {
-                                                if (favorite == true) {
-                                                    saveFavorite();
-                                                    final Snackbar snackbar = Snackbar
-                                                            .make(findViewById(R.id.main_content), "Movie has been added to favourite list!", Snackbar.LENGTH_INDEFINITE);
-                                                    snackbar.setAction("Dismiss", new View.OnClickListener() {
-                                                        @Override
-                                                        public void onClick(View view) {
-                                                            snackbar.dismiss();
-
-                                                        }
-                                                    });
-                                                    snackbar.setActionTextColor(Color.YELLOW);
-                                                    View snackbarView = snackbar.getView();
-                                                    snackbarView.setBackgroundColor(getResources().getColor(R.color.colorAccent));
-                                                    snackbar.show();
-                                                } else {
-                                                    int movie_id = getIntent().getExtras().getInt("id");
-                                                    deleteFavorite(movie_id);
-                                                    final Snackbar snackbar = Snackbar
-                                                            .make(findViewById(R.id.main_content), "Movie has been removed to favourite list!", Snackbar.LENGTH_INDEFINITE);
-                                                    snackbar.setAction("Dismiss", new View.OnClickListener() {
-                                                        @Override
-                                                        public void onClick(View view) {
-                                                            snackbar.dismiss();
-
-                                                        }
-                                                    });
-                                                    snackbar.setActionTextColor(Color.YELLOW);
-                                                    View snackbarView = snackbar.getView();
-                                                    snackbarView.setBackgroundColor(getResources().getColor(R.color.colorAccent));
-                                                    snackbar.show();
-
-                                                }
-                                            }
-                                        });
+                if (entries.size() > 0) {
+                    materialFavoriteButton.setFavorite(true);
+                    materialFavoriteButton.setOnFavoriteChangeListener((buttonView, favorite) -> {
+                            if (favorite) {
+                                saveFavorite();
+                                final Snackbar snackbar = Snackbar
+                                        .make(findViewById(R.id.main_content), "Movie has been added to favourite list!", Snackbar.LENGTH_INDEFINITE);
+                                snackbar.setAction("Dismiss", view -> snackbar.dismiss());
+                                snackbar.setActionTextColor(Color.YELLOW);
+                                View snackBarView = snackbar.getView();
+                                snackBarView.setBackgroundColor(getResources().getColor(R.color.colorAccent));
+                                snackbar.show();
+                            } else {
+                                deleteFavorite(movie_Id);
+                                final Snackbar snackbar = Snackbar
+                                        .make(findViewById(R.id.main_content), "Movie has been removed to favourite list!", Snackbar.LENGTH_INDEFINITE);
+                                snackbar.setAction("Dismiss", view -> snackbar.dismiss());
+                                snackbar.setActionTextColor(Color.YELLOW);
+                                View snackBarView = snackbar.getView();
+                                snackBarView.setBackgroundColor(getResources().getColor(R.color.colorAccent));
+                                snackbar.show();
                             }
-                        }
+                        });
+                } else {
+                    materialFavoriteButton.setOnFavoriteChangeListener(
+                            (buttonView, favorite) -> {
+                                if (favorite) {
+                                    saveFavorite();
+                                    final Snackbar snackbar = Snackbar
+                                            .make(findViewById(R.id.main_content), "Movie has been added to favourite list!", Snackbar.LENGTH_INDEFINITE);
+                                    snackbar.setAction("Dismiss", view -> snackbar.dismiss());
+                                    snackbar.setActionTextColor(Color.YELLOW);
+                                    View snackBarView = snackbar.getView();
+                                    snackBarView.setBackgroundColor(getResources().getColor(R.color.colorAccent));
+                                    snackbar.show();
+                                } else {
+                                    int movie_id = Objects.requireNonNull(getIntent().getExtras()).getInt("id");
+                                    deleteFavorite(movie_id);
+                                    final Snackbar snackbar = Snackbar
+                                            .make(findViewById(R.id.main_content), "Movie has been removed to favourite list!", Snackbar.LENGTH_INDEFINITE);
+                                    snackbar.setAction("Dismiss", view -> snackbar.dismiss());
+                                    snackbar.setActionTextColor(Color.YELLOW);
+                                    View snackBarView = snackbar.getView();
+                                    snackBarView.setBackgroundColor(getResources().getColor(R.color.colorAccent));
+                                    snackbar.show();
 
-                    }.execute();
+                                }
+                            });
+                }
+
+            }
+
+        }.execute();
     }
-
 }
 

@@ -60,4 +60,5 @@
     <string name="season">Seasons</string>
     <string name="addwatch">Add To Watchlist</string>
     <string name="empty_state">There are no movies to display, please refresh or check your network.</string>
+    <string name="movie_poster">Movie Poster</string>
 </resources>

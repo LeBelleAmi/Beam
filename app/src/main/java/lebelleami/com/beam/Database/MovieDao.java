@@ -14,25 +14,19 @@ import java.util.List;
 @Dao
 public interface MovieDao {
 
-    @Query("SELECT * FROM favourite_movies ORDER BY id")
+    @Query("SELECT * FROM favourite_movies ORDER BY title")
     LiveData<List<MovieEntry>> getAllFavouriteMovies();
 
     @Query("SELECT * FROM favourite_movies WHERE title = :title")
     List<MovieEntry> loadAll(String title);
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    @Insert
     void insertFavouriteMovie(MovieEntry movieEntry);
-
-    @Update(onConflict = OnConflictStrategy.REPLACE)
-    void updateFavouriteMovie(MovieEntry movieEntry);
 
     @Delete
     void deleteFavouriteMovie(MovieEntry movieEntry);
 
-    @Query("SELECT * FROM favourite_movies WHERE id = :movieId")
-    LiveData<MovieEntry> loadFavouriteMovieById(int movieId);
-
-    @Query("DELETE FROM favourite_movies WHERE id = :movieId")
+    @Query("DELETE FROM favourite_movies WHERE movieid = :movieId")
     void deleteFavouriteMovieById(int movieId);
 }
 

@@ -97,6 +97,8 @@ public class UpcomingFragment extends Fragment {
         llm = new LinearLayoutManager(getActivity().getApplicationContext());
         llm.setOrientation(LinearLayoutManager.VERTICAL);
         recyclerView.setLayoutManager(llm);
+
+        movieAdapter = new MovieAdapter(getActivity().getApplicationContext(), movieDataList);
         recyclerView.setAdapter(movieAdapter);
 
         if (getActivity().getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {

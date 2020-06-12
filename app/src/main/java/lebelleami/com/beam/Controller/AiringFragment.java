@@ -73,13 +73,10 @@ public class AiringFragment extends Fragment {
         swipeRefreshLayout = view.findViewById(R.id.swipe_refresh);
 
         swipeRefreshLayout.setColorSchemeResources(R.color.colorAccent);
-        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener(){
-            @Override
-            public void onRefresh(){
-                current_page = 1;
-                loadTvData();
-                Toast.makeText(getActivity().getApplicationContext(), "Refreshing Beam", Toast.LENGTH_SHORT).show();
-            }
+        swipeRefreshLayout.setOnRefreshListener(() -> {
+            current_page = 1;
+            loadTvData();
+            Toast.makeText(getActivity().getApplicationContext(), "Refreshing Beam", Toast.LENGTH_SHORT).show();
         });
 
         initViews();
@@ -98,6 +95,8 @@ public class AiringFragment extends Fragment {
         llm = new LinearLayoutManager(getActivity().getApplicationContext());
         llm.setOrientation(LinearLayoutManager.VERTICAL);
         recyclerView.setLayoutManager(llm);
+
+        tvAdapter = new TvAdapter(getActivity().getApplicationContext(), tvData);
         recyclerView.setAdapter(tvAdapter);
 
         if (getActivity().getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {

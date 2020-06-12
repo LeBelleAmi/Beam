@@ -27,6 +27,7 @@ import lebelleami.com.beam.Api.Service;
 import lebelleami.com.beam.R;
 import lebelleami.com.beam.Utils.Url;
 import lebelleami.com.beam.Model.Tv;
+import lebelleami.com.beam.View.MovieAdapter;
 import lebelleami.com.beam.View.TvAdapter;
 import lebelleami.com.beam.Model.TvData;
 import retrofit2.Call;
@@ -97,6 +98,8 @@ public class PopularFragment extends Fragment {
         llm = new LinearLayoutManager(getActivity().getApplicationContext());
         llm.setOrientation(LinearLayoutManager.VERTICAL);
         recyclerView.setLayoutManager(llm);
+
+        tvAdapter = new TvAdapter(getActivity().getApplicationContext(), tvData);
         recyclerView.setAdapter(tvAdapter);
 
         if (getActivity().getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {

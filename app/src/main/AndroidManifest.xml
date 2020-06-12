@@ -2,9 +2,6 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="lebelleami.com.beam">
 
-    <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-
     <application
         android:allowBackup="true"
         android:icon="@drawable/beamicon"
@@ -12,6 +9,7 @@
         android:roundIcon="@drawable/beamicon"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+        <activity android:name=".Controller.FavouriteActivity"></activity>
         <activity
             android:name=".Controller.SplashScreen"
             android:configChanges="orientation|keyboardHidden|screenSize"
@@ -30,9 +28,12 @@
         <activity
             android:name=".Controller.TvDetails"
             android:theme="@style/AppTheme2" />
-        <activity android:name=".Controller.Settings"
-            android:theme="@style/Base.AppSettings">
-        </activity>
+        <activity
+            android:name=".Controller.Settings"
+            android:theme="@style/Base.AppSettings"></activity>
     </application>
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+
+    <uses-permission android:name="android.permission.INTERNET" />
 
 </manifest>

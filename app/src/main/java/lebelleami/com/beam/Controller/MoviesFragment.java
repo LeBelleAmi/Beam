@@ -35,6 +35,7 @@ import lebelleami.com.beam.Utils.Url;
 import lebelleami.com.beam.Model.Movie;
 import lebelleami.com.beam.Model.MovieData;
 import lebelleami.com.beam.View.MovieAdapter;
+import lebelleami.com.beam.View.TrailerAdapter;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -102,6 +103,8 @@ public class MoviesFragment extends Fragment {
         // use a linear layout manager
         llm = new LinearLayoutManager(getActivity().getApplicationContext());
         llm.setOrientation(LinearLayoutManager.VERTICAL);
+
+        movieAdapter = new MovieAdapter(getActivity().getApplicationContext(), movieDataList);
         recyclerView.setLayoutManager(llm);
         recyclerView.setAdapter(movieAdapter);
 
@@ -189,12 +192,8 @@ public class MoviesFragment extends Fragment {
                         load_more.setVisibility(View.GONE);
                         emptyState.setVisibility(View.GONE);
 
-                        //Log.i(TAG, "movies: " + response.body().getResults().toString());
-                        //Toast.makeText(getActivity().getApplicationContext(), response.body().toString() + "string", Toast.LENGTH_LONG).show();
                         movie = response.body();
                         List<MovieData> movieList = movie.getResults();
-                        //Toast.makeText(getActivity().getApplicationContext(), current_page + "loaded", Toast.LENGTH_LONG).show();
-
 
                         movieAdapter = new MovieAdapter(getActivity().getApplicationContext(), movieList);
                         recyclerView.smoothScrollToPosition(0);
