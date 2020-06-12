@@ -16,7 +16,7 @@ public class Url {
     public static final String TYPE_E = "tv/popular";
     public static final String TYPE_F = "tv/top_rated";
     public static final String TYPE_G = "tv/airing_today";
-    public static final String API_KEY = "b2c28707a30106ac0daaf04d0f90f5fd";
+    public static final String API_KEY = "YOUR_API_KEY";
     public static final String TRAILER_MOVIE = "movie/";
     public static final String TRAILER_TV = "tv/";
     public static final String REVIEWS = "/reviews";
